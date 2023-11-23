@@ -5,8 +5,8 @@ import jakarta.persistence.*
 import org.jetbrains.annotations.NotNull
 
 @Entity
-@Table(name = "INGREDIENT_NAME_TRANSLATE")
-class IngredientNameTranslationEntity(
+@Table(name = "ingredient_name_translation")
+data class IngredientNameTranslationEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: Long? = null,
