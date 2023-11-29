@@ -17,6 +17,6 @@ data class IngredientNameTranslationEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_name")
     @JsonBackReference
-    val ingredient: IngredientEntity = IngredientEntity(),
+    val ingredient: IngredientEntity,
 
     )
