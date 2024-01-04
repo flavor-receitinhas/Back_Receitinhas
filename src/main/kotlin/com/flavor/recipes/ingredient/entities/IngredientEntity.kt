@@ -5,8 +5,7 @@ import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import jakarta.persistence.*
 import org.jetbrains.annotations.NotNull
 
-@Entity
-@Table(name = "ingredient")
+@Entity(name = "ingredient")
 data class IngredientEntity (
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -14,7 +13,5 @@ data class IngredientEntity (
     @OneToMany(mappedBy = "ingredient", fetch = FetchType.LAZY)
     @JsonManagedReference
     val name : MutableList<IngredientNameTranslationEntity> = mutableListOf(),
-    val description: String = "",
-    @ManyToOne
-    val recipeIngredient : RecipeIngredientEntity,
+    val description: String = ""
 )

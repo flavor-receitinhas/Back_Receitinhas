@@ -4,8 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference
 import jakarta.persistence.*
 import org.jetbrains.annotations.NotNull
 
-@Entity
-@Table(name = "ingredient_name_translation")
+@Entity(name = "ingredient_name_translation")
 data class IngredientNameTranslationEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -17,6 +16,5 @@ data class IngredientNameTranslationEntity(
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "ingredient_name")
     @JsonBackReference
-    val ingredient: IngredientEntity,
-
-    )
+    val ingredient: IngredientEntity
+)

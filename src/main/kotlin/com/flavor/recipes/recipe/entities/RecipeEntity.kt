@@ -2,37 +2,22 @@ package com.flavor.recipes.recipe.entities
 
 import com.flavor.recipes.user.entities.DifficultyRecipes
 import jakarta.persistence.*
+import org.springframework.data.mongodb.core.mapping.Document
 
 
-@Entity
-@Table(name = "recipe")
+@Document(collection = "recipe")
 data class RecipeEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: Long,
-
+    val id: String?,
     val title: String,
     val subTitle: String,
-
-    @ElementCollection
     val images: List<String>,
-
     val details: String,
     val timePrepared: Int,
-
     val difficultyRecipe: DifficultyRecipes,
-
     val portion: Int,
-
-    @OneToOne
-    @JoinColumn()
-    val ingredient: RecipeIngredientEntity,
-
-    @OneToOne
-    @JoinColumn()
-    val instruction: InstructionEntity,
-
-    @OneToOne
-    @JoinColumn()
-    val serveFood: ServeFoodEntity,
+    val instruction: String,
+    val serveFood: String,
+    val ingredients: Set<RecipeIngredientEntity>
 )
