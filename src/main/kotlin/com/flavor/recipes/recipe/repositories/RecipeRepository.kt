@@ -6,6 +6,6 @@ import org.springframework.data.mongodb.repository.MongoRepository
 import org.springframework.stereotype.Repository
 
 @Repository()
-interface RecipeRepository : MongoRepository<RecipeEntity, Long> {
+interface RecipeRepository : MongoRepository<RecipeEntity, String> {
 
 }
