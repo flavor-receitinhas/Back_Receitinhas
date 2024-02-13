@@ -31,7 +31,6 @@ class RecipeController {
 
     @GetMapping("/{id}")
     fun getIngredientById(@PathVariable id: String): Any {
-            throw Exception("test")
             val findIngredient = recipeRepository.findById(id)
             if (!findIngredient.isPresent) {
                 return "Not Found"
