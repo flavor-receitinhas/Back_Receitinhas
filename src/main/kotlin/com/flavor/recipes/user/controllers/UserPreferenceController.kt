@@ -1,5 +1,6 @@
 package com.flavor.recipes.user.controllers
 
+import com.flavor.recipes.core.HandleException
 import com.flavor.recipes.user.entities.UserPreference
 import com.flavor.recipes.user.repositories.UserPreferenceRepository
 import org.springframework.beans.factory.annotation.Autowired
@@ -19,21 +20,19 @@ class UserPreferenceController {
     @Autowired
     lateinit var repository: UserPreferenceRepository
     @GetMapping("/{userId}/preference")
-    fun getPreference(@PathVariable userId: String): ResponseEntity<UserPreference?>{
+    fun getPreference(@PathVariable userId: String): ResponseEntity<UserPreference>{
         try {
             val result = repository.findByUserId(userId)
             return ResponseEntity.ok()
                 .body(result)
         }catch (e: Exception){
-            return ResponseEntity
-                .internalServerError()
-                .build()
+            return HandleException<UserPreference>().handle(e)
         }
     }
 
     @PutMapping("/{userId}/preference")
     fun updatePreference(@PathVariable userId: String,
-                         @RequestBody body: UserPreference): ResponseEntity<UserPreference?>
+                         @RequestBody body: UserPreference): ResponseEntity<UserPreference>
     {
         try {
             val find = repository.findByUserId(userId)
@@ -49,9 +48,7 @@ class UserPreferenceController {
             return ResponseEntity.ok()
                 .body(result)
         }catch (e: Exception){
-            return ResponseEntity
-                .internalServerError()
-                .build()
+            return HandleException<UserPreference>().handle(e)
         }
     }
 }
