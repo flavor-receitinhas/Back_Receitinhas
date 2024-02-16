@@ -5,10 +5,10 @@ import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.security.config.annotation.web.builders.HttpSecurity
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity
-import org.springframework.security.config.annotation.web.configurers.CorsConfigurer
 import org.springframework.security.config.annotation.web.configurers.CsrfConfigurer
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer
 import org.springframework.security.config.http.SessionCreationPolicy
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
 import org.springframework.security.web.SecurityFilterChain
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
@@ -33,9 +33,11 @@ class SecurityConfig (
                 )
             }
             .authorizeHttpRequests { authorize ->
-                authorize.anyRequest().authenticated()
+                authorize
+                    //.requestMatchers("/recipe").permitAll()
+                    .anyRequest().authenticated()
             }
-            .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter::class.java)
+            .addFilterBefore(securityFilter, BearerTokenAuthenticationFilter::class.java)
             .cors { corsConfigurationSource() }
             .build()
     }
@@ -44,9 +46,9 @@ class SecurityConfig (
     fun corsConfigurationSource(): CorsConfigurationSource {
         // allow localhost for dev purposes
         val configuration = CorsConfiguration()
-        configuration.allowedOrigins = listOf("http://localhost:8080")
+        configuration.allowedOrigins = listOf("*")
         configuration.allowedMethods = listOf("GET", "POST", "PUT", "DELETE")
-        configuration.allowedHeaders = listOf("authorization", "content-type")
+        configuration.allowedHeaders = listOf("Authorization", "content-type")
         val source = UrlBasedCorsConfigurationSource()
         source.registerCorsConfiguration("/**", configuration)
         return source

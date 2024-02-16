@@ -11,7 +11,10 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestParam
 import org.springframework.web.bind.annotation.RestController
 import io.sentry.Sentry
+import org.springframework.http.ResponseEntity
+import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.PathVariable
+import java.net.http.HttpResponse
 import kotlin.concurrent.thread
 
 @RestController
@@ -20,12 +23,12 @@ class RecipeController {
     @Autowired
     lateinit var recipeRepository: RecipeRepository
     @GetMapping()
-    fun getIngredient(): Any {
+    fun getIngredient(authentication: Authentication): Any {
         try {
             return recipeRepository.findAll();
         } catch (e: Exception) {
             Sentry.captureException(e)
-            return e
+            return ResponseEntity.badRequest()
         }
     }
 
