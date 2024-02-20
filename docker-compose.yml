@@ -50,5 +50,5 @@ networks:
 volumes:
   mariadb:
 
-    # compose up -d --no-build --remove-orphans
+    # compose up -d --build --remove-orphans
     # .\gradlew build -x test
