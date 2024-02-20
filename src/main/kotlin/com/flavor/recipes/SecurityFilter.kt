@@ -30,10 +30,12 @@ class SecurityFilter : OncePerRequestFilter() {
         val token = recoverToken(request)
         if (token != null) {
             val login = tokenService.validateToken(token.toString())
-            val authentication = UsernamePasswordAuthenticationToken(login,"", listOf())
-            val context = SecurityContextHolder.getContext()
-            context.authentication = authentication
-            SecurityContextHolder.setContext(context)
+            if (login != null) {
+                val authentication = UsernamePasswordAuthenticationToken(login,"", listOf())
+                val context = SecurityContextHolder.getContext()
+                context.authentication = authentication
+                SecurityContextHolder.setContext(context)
+            }
         }
         filterChain.doFilter(request, response)
     }

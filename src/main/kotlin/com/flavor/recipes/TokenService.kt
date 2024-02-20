@@ -12,7 +12,7 @@ import org.springframework.stereotype.Service
 @Service
 class TokenService {
     var logger: Logger = LoggerFactory.getLogger("TokenService")
-    fun validateToken(token: String): String {
+    fun validateToken(token: String): String? {
         try {
             // Verify the ID token while checking if the token is revoked by passing checkRevoked
             // as true.
@@ -20,15 +20,13 @@ class TokenService {
             val decodedToken = FirebaseAuth.getInstance()
                 .verifyIdToken(token, checkRevoked)
             // Token is valid and not revoked.
-            val uid = decodedToken.uid
-            return  uid;
+            return decodedToken.uid;
         } catch (e: FirebaseAuthException) {
-            logger.error(e.message, e)
             if (e.authErrorCode == AuthErrorCode.REVOKED_ID_TOKEN) {
-                return "Token has been revoked. Inform the user to re-authenticate or signOut() the user."
-            } else {
-                return "Token is invalid."
+                return null
             }
+            logger.error(e.message, e)
+            return null
         }
     }
 }

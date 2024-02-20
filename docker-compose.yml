@@ -29,6 +29,7 @@ services:
       DB_URL: ${DB_URL}
       MONGO_PASSWORD: ${MONGO_PASSWORD}
       GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
+      MONGO_HOST: ${MONGO_HOST}
     networks:
       - rede-default
     ports:
