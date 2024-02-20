@@ -20,19 +20,19 @@ class UserPreferenceController {
     @Autowired
     lateinit var repository: UserPreferenceRepository
     @GetMapping("/{userId}/preference")
-    fun getPreference(@PathVariable userId: String): ResponseEntity<UserPreference>{
+    fun getPreference(@PathVariable userId: String): ResponseEntity<Any>{
         try {
             val result = repository.findByUserId(userId)
             return ResponseEntity.ok()
                 .body(result)
         }catch (e: Exception){
-            return HandleException<UserPreference>().handle(e)
+            return HandleException<Any>().handle(e)
         }
     }
 
     @PutMapping("/{userId}/preference")
     fun updatePreference(@PathVariable userId: String,
-                         @RequestBody body: UserPreference): ResponseEntity<UserPreference>
+                         @RequestBody body: UserPreference): ResponseEntity<Any>
     {
         try {
             val find = repository.findByUserId(userId)
@@ -48,7 +48,7 @@ class UserPreferenceController {
             return ResponseEntity.ok()
                 .body(result)
         }catch (e: Exception){
-            return HandleException<UserPreference>().handle(e)
+            return HandleException<Any>().handle(e)
         }
     }
 }
