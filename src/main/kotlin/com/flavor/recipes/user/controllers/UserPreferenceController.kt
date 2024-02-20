@@ -22,11 +22,19 @@ class UserPreferenceController {
     @GetMapping("/{userId}/preference")
     fun getPreference(@PathVariable userId: String): ResponseEntity<Any>{
         try {
-            val result = repository.findByUserId(userId)
-            return ResponseEntity.ok()
-                .body(result)
+            var result = repository.findByUserId(userId)
+            if (result == null){
+               result = UserPreference(
+                   protein = listOf(),
+                   userId = userId,
+                   difficultyRecipe = listOf(),
+                   dietaryRestriction = listOf(),
+                   id = null
+               )
+            }
+            return ResponseEntity.ok(result)
         }catch (e: Exception){
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 
@@ -45,10 +53,9 @@ class UserPreferenceController {
                     protein = body.protein
                 ))
             }
-            return ResponseEntity.ok()
-                .body(result)
+            return ResponseEntity.ok(result)
         }catch (e: Exception){
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 }

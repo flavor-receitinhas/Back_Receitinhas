@@ -25,7 +25,7 @@ class RecipeController {
         try {
             return ResponseEntity.ok(recipeRepository.findAll());
         } catch (e: Exception) {
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 
@@ -38,7 +38,7 @@ class RecipeController {
             }
             return ResponseEntity.ok(findIngredient.get())
         } catch (e: Exception) {
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 
@@ -48,7 +48,7 @@ class RecipeController {
             val result = recipeRepository.save(body)
             return ResponseEntity.ok(result)
         } catch (e: Exception) {
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 
@@ -74,7 +74,7 @@ class RecipeController {
             ))
             return ResponseEntity.ok(result)
         } catch (e: Exception) {
-            return HandleException<Any>().handle(e)
+            return HandleException().handle(e)
         }
     }
 
