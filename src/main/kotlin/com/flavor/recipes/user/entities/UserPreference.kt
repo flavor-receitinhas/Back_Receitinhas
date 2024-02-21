@@ -10,8 +10,6 @@ data class UserPreference(
     private val id: Long?,
     @Column(name = "user_id", unique = true)
     val userId: String,
-    @Column(name = "user_name", unique = true)
-    val userName: String,
     val protein: List<Proteins>,
     @Column(name = "dietary_restriction")
     val dietaryRestriction: List<DietaryRestrictions>,
