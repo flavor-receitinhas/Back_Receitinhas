@@ -10,11 +10,10 @@ import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import org.springframework.web.multipart.MultipartHttpServletRequest
-import org.springframework.web.servlet.mvc.support.RedirectAttributes
 import java.util.*
 
-
+const val LIMIT_FILE_SIZE = 3000000
+val TYPE_CONTENT_IMAGE = listOf("JPG", "GIF", "PNG", "JPEG")
 @RestController
 @RequestMapping("/profile")
 class ProfileController {
@@ -69,6 +68,7 @@ class ProfileController {
     ): ResponseEntity<Any> {
         return try {
             var find: ProfileEntity = profileRepository.findByUserID(userID) ?: throw BusinessException("Perfil não encontrado")
+            validateImage(file)
             bucketRepository.saveImage(userID, file.bytes, file.contentType!!)
             val image = bucketRepository.getLinkImage(userID)
             val result = profileRepository.save(find.copy(image = image))
@@ -76,6 +76,11 @@ class ProfileController {
         } catch (e: Exception){
             HandleException().handle(e)
         }
+    }
+    private fun validateImage(file: MultipartFile){
+        if (file.size > LIMIT_FILE_SIZE) throw BusinessException("Imagem maior que o permetido: 3mb")
+        val typeImage = file.contentType!!.replace("image/", "").uppercase()
+        if (!TYPE_CONTENT_IMAGE.contains(typeImage)) throw BusinessException("Tipo de arquivo não permitido.")
     }
 
 }
