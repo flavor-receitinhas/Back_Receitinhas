@@ -32,8 +32,8 @@ class ProfileController {
                     biography = "",
                     createdAt = Date().time,
                     userID = userID,
-                    name = "",
-                    image = "",
+                    image = null,
+                    name = null,
                 )
                 profileRepository.save(find)
             }
