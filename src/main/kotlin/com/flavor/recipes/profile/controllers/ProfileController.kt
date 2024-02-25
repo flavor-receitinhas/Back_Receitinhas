@@ -49,6 +49,7 @@ class ProfileController {
                       @PathVariable userID: String
     ): ResponseEntity<Any> {
         try {
+            if ((body.name?.isBlank() == true)) throw BusinessException("Nome não pode ser vazio")
             val find = profileRepository.findByUserID(userID) ?: throw BusinessException("Perfil não encontrado")
             val result = profileRepository.save(find.copy(
                 biography = body.biography,
