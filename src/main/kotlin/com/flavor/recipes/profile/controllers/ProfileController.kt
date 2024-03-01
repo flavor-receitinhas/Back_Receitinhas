@@ -72,7 +72,7 @@ class ProfileController {
             validateImage(file)
             bucketRepository.saveImage(userID, file.bytes, file.contentType!!)
             val image = bucketRepository.getLinkImage(userID)
-            val result = profileRepository.save(find.copy(image = image))
+            val result = profileRepository.save(find.copy(image = image, updatedAt = Date().time))
             ResponseEntity.ok(result)
         } catch (e: Exception){
             HandleException().handle(e)
