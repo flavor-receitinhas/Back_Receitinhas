@@ -17,5 +17,6 @@ data class ProfileEntity(
     var createdAt: Long? = null,
     @Column(name = "updated_at", nullable = false)
     var updatedAt: Long?,
+    @Column(columnDefinition = "TEXT")
     var image: String?
 )
