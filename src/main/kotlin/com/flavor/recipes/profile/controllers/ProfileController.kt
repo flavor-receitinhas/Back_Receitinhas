@@ -64,14 +64,17 @@ class ProfileController {
 
     @PutMapping("/{userID}/image")
     fun handleFileUpload(
-        @RequestPart file: MultipartFile,
+        @RequestPart file: MultipartFile?,
         @PathVariable userID: String
     ): ResponseEntity<Any> {
         return try {
-            var find: ProfileEntity = profileRepository.findByUserID(userID) ?: throw BusinessException("Perfil não encontrado")
-            validateImage(file)
-            bucketRepository.saveImage(userID, file.bytes, file.contentType!!)
-            val image = bucketRepository.getLinkImage(userID)
+            var image: String? = null
+            val find: ProfileEntity = profileRepository.findByUserID(userID) ?: throw BusinessException("Perfil não encontrado")
+            if (file != null){
+                validateImage(file)
+                bucketRepository.saveImage(userID, file.bytes, file.contentType!!)
+                image = bucketRepository.getLinkImage(userID)
+            }
             val result = profileRepository.save(find.copy(image = image, updatedAt = Date().time))
             ResponseEntity.ok(result)
         } catch (e: Exception){
