@@ -15,6 +15,7 @@ class RecipesApplication{
 			// Inicialização do FirebaseApp
 			val options = FirebaseOptions.builder()
 				.setCredentials(GoogleCredentials.getApplicationDefault())
+				.setStorageBucket("receitinhas-28d4a.appspot.com")
 				.build()
 			FirebaseApp.initializeApp(options)
 		} catch(e: Exception){
