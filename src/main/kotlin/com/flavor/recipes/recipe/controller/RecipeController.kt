@@ -24,7 +24,7 @@ class RecipeController {
     @GetMapping()
     fun list(authentication: Authentication): ResponseEntity<Any> {
         try {
-            return ResponseEntity.ok(recipeRepository.findByStatusNot(RecipeStatus.removed.name));
+            return ResponseEntity.ok(recipeRepository.findByStatusNot(RecipeStatus.blocked.name));
         } catch (e: Exception) {
             return HandleException().handle(e)
         }
@@ -37,8 +37,8 @@ class RecipeController {
             if (!recipe.isPresent) {
                throw BusinessException("Receita não encontrada")
             }
-            if (recipe.get().status == RecipeStatus.removed) {
-                throw BusinessException("Está receita foi removida")
+            if (recipe.get().status == RecipeStatus.blocked) {
+                throw BusinessException("Está receita foi bloqueada")
             }
 
             return ResponseEntity.ok(recipe.get())
@@ -50,8 +50,8 @@ class RecipeController {
     @PostMapping
     fun create(@RequestBody body: RecipeEntity): ResponseEntity<Any> {
         try {
-            if (body.status == RecipeStatus.removed) {
-                throw BusinessException("Não pode criar uma receita com status removido")
+            if (body.status == RecipeStatus.blocked) {
+                throw BusinessException("Não pode criar uma receita bloqueada")
             }
             val result = recipeRepository.save(body)
             return ResponseEntity.ok(result)
@@ -67,8 +67,8 @@ class RecipeController {
             
             val recipe = recipeRepository.findById(id)
             if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
-            if (recipe.get().status == RecipeStatus.removed) {
-                throw BusinessException("Está receita não pode ser alterada, removida")
+            if (recipe.get().status == RecipeStatus.blocked) {
+                throw BusinessException("Está receita não pode ser alterada.")
             }
 
             val result = recipeRepository.save(recipe.get().copy(
