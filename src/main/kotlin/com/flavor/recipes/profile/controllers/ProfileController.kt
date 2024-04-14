@@ -86,5 +86,20 @@ class ProfileController {
         val typeImage = file.contentType!!.replace("image/", "").uppercase()
         if (!TYPE_CONTENT_IMAGE.contains(typeImage)) throw BusinessException("Tipo de arquivo não permitido.")
     }
-
+    @PutMapping("/{userID}/name")
+    fun updateName(
+        @RequestBody name: String,
+        @PathVariable userID: String
+    ): ResponseEntity<Any> {
+        return try {
+            val find = profileRepository.findByName(name)
+            if (find == null){
+                throw BusinessException("Esse nome ja está em uso, tente outro")
+            }
+            val result = profileRepository.save(find.copy(name = name, updatedAt = Date().time))
+            ResponseEntity.ok(result)
+        } catch (e: Exception){
+            HandleException().handle(e)
+        }
+    }
 }
