@@ -10,7 +10,6 @@ import org.springframework.security.config.annotation.web.configurers.SessionMan
 import org.springframework.security.config.http.SessionCreationPolicy
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter
 import org.springframework.security.web.SecurityFilterChain
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter
 import org.springframework.web.cors.CorsConfiguration
 import org.springframework.web.cors.CorsConfigurationSource
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource
@@ -18,11 +17,10 @@ import org.springframework.web.cors.UrlBasedCorsConfigurationSource
 
 @Configuration
 @EnableWebSecurity
-class SecurityConfig (
-    private val tokenService: TokenService,
-) {
+class SecurityConfig {
     @Autowired
     lateinit var securityFilter: SecurityFilter
+
     @Bean
     @Throws(Exception::class)
     fun securityFilterChain(http: HttpSecurity): SecurityFilterChain {
@@ -32,11 +30,7 @@ class SecurityConfig (
                     SessionCreationPolicy.STATELESS
                 )
             }
-            .authorizeHttpRequests { authorize ->
-                authorize
-                    //.requestMatchers("/recipe").permitAll()
-                    .anyRequest().authenticated()
-            }
+            .authorizeHttpRequests { authorize -> authorize.anyRequest().authenticated() }
             .addFilterBefore(securityFilter, BearerTokenAuthenticationFilter::class.java)
             .cors { corsConfigurationSource() }
             .build()
