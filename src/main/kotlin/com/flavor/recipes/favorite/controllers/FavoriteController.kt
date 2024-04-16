@@ -5,6 +5,7 @@ import com.flavor.recipes.core.HandleException
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -18,17 +19,24 @@ class FavoriteController {
     lateinit var favoriteRepository: FavoriteRepository
 
     @GetMapping("/{userId}")
-    @ResponseBody
     fun list(
         authentication: Authentication,
         @PathVariable userId: String,
         @RequestParam sort: String?,
+        @RequestParam page: Int?,
     ): ResponseEntity<Any> {
         return try {
             if (userId != authentication.principal.toString()) {
                 throw BusinessException("User não pode ver os favoritos de outro usuario")
             }
-            val find = favoriteRepository.findByUserId(userId, Sort.by(sort ?: "created_at").descending())
+            val find = favoriteRepository.findByUserId(
+                userId,
+                PageRequest.of(
+                    page ?: 0,
+                    25,
+                    Sort.by(sort ?: Favorite::createdAt.name)
+                )
+            )
             ResponseEntity.ok(find)
         } catch (e: Exception) {
             HandleException().handle(e)
