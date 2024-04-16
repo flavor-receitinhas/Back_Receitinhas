@@ -70,10 +70,12 @@ class FavoriteController {
                 throw BusinessException("User do token é diferente do body")
             }
             val find = favoriteRepository.findById(id)
+            if (!find.isPresent) {
+                return ResponseEntity.notFound().build()
+            }
             if (find.get().userId != userId) {
                 throw BusinessException("User não pode remover dos favoritos")
             }
-            if (!find.isPresent) throw BusinessException("receita não encontrada")
             val result = favoriteRepository.deleteById(id)
             ResponseEntity.ok(result)
         } catch (e: Exception) {
