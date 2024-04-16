@@ -61,14 +61,10 @@ class FavoriteController {
     @ResponseBody
     fun delete(
         authentication: Authentication,
-        @RequestBody body: Favorite,
         @PathVariable id: Long,
     ): ResponseEntity<Any> {
         return try {
             val userId = authentication.principal.toString()
-            if (body.userId != userId) {
-                throw BusinessException("User do token é diferente do body")
-            }
             val find = favoriteRepository.findById(id)
             if (!find.isPresent) {
                 return ResponseEntity.notFound().build()
