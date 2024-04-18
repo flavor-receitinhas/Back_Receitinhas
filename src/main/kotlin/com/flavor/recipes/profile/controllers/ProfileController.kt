@@ -2,6 +2,7 @@ package com.flavor.recipes.profile.controllers
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.core.HandleException
+import com.flavor.recipes.profile.dtos.ProfileNameDto
 import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.profile.repositories.BucketRepository
 import com.flavor.recipes.profile.repositories.ProfileRepository
@@ -88,15 +89,16 @@ class ProfileController {
     }
     @PutMapping("/{userID}/name")
     fun updateName(
-        @RequestBody name: String,
+        @RequestBody profileName: ProfileNameDto,
         @PathVariable userID: String
     ): ResponseEntity<Any> {
         return try {
-            val find = profileRepository.findByName(name)
-            if (find == null){
+            val find = profileRepository.findByName(profileName.name)
+            if (find != null){
                 throw BusinessException("Esse nome ja está em uso, tente outro")
             }
-            val result = profileRepository.save(find.copy(name = name, updatedAt = Date().time))
+            val userFind = profileRepository.findByUserID(userID)
+            val result = userFind?.let { profileRepository.save(it.copy(name = profileName.name, updatedAt = Date().time)) }
             ResponseEntity.ok(result)
         } catch (e: Exception){
             HandleException().handle(e)
