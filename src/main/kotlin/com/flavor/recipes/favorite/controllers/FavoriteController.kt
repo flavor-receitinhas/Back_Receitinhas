@@ -39,8 +39,8 @@ class FavoriteController {
                     PageRequest.of(
                         page ?: 0,
                         25,
-                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name) else
-                            Sort.by(sort ?: Favorite::createdAt.name).descending()
+                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                            Sort.by(sort ?: Favorite::createdAt.name)
                     )
                 )
             } else {
@@ -49,8 +49,8 @@ class FavoriteController {
                     PageRequest.of(
                         page ?: 0,
                         25,
-                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name) else
-                            Sort.by(sort ?: Favorite::createdAt.name).descending()
+                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                            Sort.by(sort ?: Favorite::createdAt.name)
                     )
                 )
             }
