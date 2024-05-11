@@ -24,19 +24,37 @@ class FavoriteController {
         @PathVariable userId: String,
         @RequestParam sort: String?,
         @RequestParam page: Int?,
+        @RequestParam isDesc: Boolean = false,
+        @RequestParam search: String?,
     ): ResponseEntity<Any> {
         return try {
             if (userId != authentication.principal.toString()) {
                 throw BusinessException("User não pode ver os favoritos de outro usuario")
             }
-            val find = favoriteRepository.findByUserId(
-                userId,
-                PageRequest.of(
-                    page ?: 0,
-                    25,
-                    Sort.by(sort ?: Favorite::createdAt.name)
+            if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
+            val find = if (search != null) {
+                favoriteRepository.findByUserIdAndSearch(
+                    userId,
+                    search,
+                    PageRequest.of(
+                        page ?: 0,
+                        25,
+                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                            Sort.by(sort ?: Favorite::createdAt.name)
+                    )
                 )
-            )
+            } else {
+                favoriteRepository.findByUserId(
+                    userId,
+                    PageRequest.of(
+                        page ?: 0,
+                        25,
+                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                            Sort.by(sort ?: Favorite::createdAt.name)
+                    )
+                )
+            }
+
             ResponseEntity.ok(find)
         } catch (e: Exception) {
             HandleException().handle(e)
