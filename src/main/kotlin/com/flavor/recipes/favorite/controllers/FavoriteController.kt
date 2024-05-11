@@ -4,6 +4,7 @@ import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.core.HandleException
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
+import com.flavor.recipes.recipe.repositories.RecipeRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -17,6 +18,8 @@ import java.util.*
 class FavoriteController {
     @Autowired
     lateinit var favoriteRepository: FavoriteRepository
+    @Autowired
+    lateinit var recipeRepository: RecipeRepository
 
     @GetMapping("/{userId}")
     fun list(
@@ -68,8 +71,12 @@ class FavoriteController {
             if (body.userId != authentication.principal.toString()) {
                 throw BusinessException("User do token é diferente do body")
             }
-            val find = favoriteRepository.save(body.copy(createdAt = Date().time, updatedAt = Date().time))
-            ResponseEntity.ok(find)
+            val findRecipe = recipeRepository.findById(body.recipeId)
+            if (!findRecipe.isPresent){
+                throw BusinessException("A receita não existe")
+            }
+            val favorite = favoriteRepository.save(body.copy(createdAt = Date().time, updatedAt = Date().time))
+            ResponseEntity.ok(favorite)
         } catch (e: Exception) {
             HandleException().handle(e)
         }
