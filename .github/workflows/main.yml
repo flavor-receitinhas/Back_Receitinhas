@@ -69,11 +69,5 @@ jobs:
           fileName: 'ssh_key'
           encodedString: ${{ secrets.SSH_KEY }}
 
-      - name: Deploy new version
-        uses: appleboy/ssh-action@v1.0.3
-        with:
-          host: ${{ secrets.SSH_HOST }}
-          username: ${{ secrets.SSH_USERNAME }}
-          key_path: ${{ steps.get_ssh.outputs.filePath }}
-          port: 22
-          script: whoami
+      - name: Down ol
+        run: ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "whoami"
