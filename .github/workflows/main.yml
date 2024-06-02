@@ -16,6 +16,10 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+      - name: adc.json
+        run: echo $ADC_FILE >> src/main/resources/adc.json
+        env:
+          ADC_FILE: ${{ secrets.ADC_JSON }}
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
       - name: gradle permission fix
