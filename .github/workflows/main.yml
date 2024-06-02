@@ -53,7 +53,4 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Docker build
-        run: docker buildx build --platform linux/arm64 -t cledsonv/receitinhas .
-
-      - name: Docker push
-        run: docker push cledsonv/receitinhas
+        run: docker buildx build --push --platform linux/arm64 -t cledsonv/receitinhas:latest .
