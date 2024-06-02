@@ -13,6 +13,8 @@ jobs:
         uses: actions/checkout@v3
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
+      - name: gradle permission fix
+        run: chmod +x ./gradlew
       - name: Build with Gradle
         run: ./gradlew build
       - name: Set up QEMU
