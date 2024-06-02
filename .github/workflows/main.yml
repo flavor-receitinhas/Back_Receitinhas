@@ -79,12 +79,12 @@ jobs:
 
       - name: Down old version
         run: |
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "docker compose down api-receitinhas"
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "cd receitinhas/ && docker compose down api-receitinhas"
 
       - name: Pull new version
         run: |
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "docker compose pull api-receitinhas"
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "cd receitinhas/ && docker compose pull api-receitinhas"
 
       - name: Start new version
         run: |
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "docker compose up api-receitinhas"
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "cd receitinhas/ && docker compose up api-receitinhas"
