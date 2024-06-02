@@ -52,5 +52,28 @@ jobs:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
 
-      - name: Docker build
+      - name: Docker build and push
         run: docker buildx build --push --platform linux/arm64 -t cledsonv/receitinhas:latest .
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+
+      - name: Get SSH Key
+        id: get_ssh
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: 'ssh_key'
+          encodedString: ${{ secrets.SSH_KEY }}
+
+      - name: Deploy new version
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key_path: ${{ steps.get_ssh.outputs.filePath }}
+          port: 22
+          script: whoami
