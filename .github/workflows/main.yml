@@ -87,4 +87,4 @@ jobs:
 
       - name: Start new version
         run: |
-          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "cd /home/ubuntu/workspace/receitinhas && docker compose up api-receitinhas"
+          ssh ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} -i ${{ steps.get_ssh.outputs.filePath }} "cd /home/ubuntu/workspace/receitinhas && docker compose up api-receitinhas -d"
