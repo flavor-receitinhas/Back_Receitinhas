@@ -41,4 +41,3 @@ jobs:
           platforms: linux/amd64, linux/arm64
           secrets: |
             "adc_json=${{ secrets.ADC_JSON }}"
-
