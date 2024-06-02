@@ -16,6 +16,15 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: 17
+      - name: base64-to-file
+        id: write_file
+        uses: timheuer/base64-to-file@v1.0.3
+        with:
+          fileName: 'adc.json'
+          encodedString: ${{ secrets.ADC_JSON }}
+      - name: Inject env variables
+        run: |
+          mv ${{ steps.write_file.outputs.filePath }} ${{ github.workspace }}/src/main/resources/adc.json
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
       - name: gradle permission fix
@@ -33,11 +42,5 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USER }}
           password: ${{ secrets.DOCKER_PASSWORD }}
-      - name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          push: true
-          tags: cledsonv/receitinhas:latest
-          platforms: linux/amd64, linux/arm64
-          secrets: |
-            "adc_json=${{ secrets.ADC_JSON }}"
+      - name: Docker build
+        run: docker buildx build --platform linux/arm64 -t cledsonv/receitinhas .
