@@ -33,7 +33,7 @@ services:
     networks:
       - rede-default
     ports:
-      - 8080:8080
+      - 80:80
   mongo:
     image: mongo:7.0.0
     restart: always
