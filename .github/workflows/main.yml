@@ -71,6 +71,7 @@ jobs:
 
       - name: Fix key permission
         run: |
+          mkdir -p ~/.ssh/
           chmod 600 ${{ steps.get_ssh.outputs.filePath }}
           echo "$SSH_KNOWN_HOSTS" >> ~/.ssh/known_hosts
         env:
