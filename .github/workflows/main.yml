@@ -17,7 +17,7 @@ jobs:
           distribution: 'temurin'
           java-version: 17
       - name: adc.json
-        run: echo $ADC_FILE >> src/main/resources/adc.json
+        run: echo $ADC_FILE >> ${{ github.workspace }}/src/main/resources/adc.json
         env:
           ADC_FILE: ${{ secrets.ADC_JSON }}
       - name: Setup Gradle
