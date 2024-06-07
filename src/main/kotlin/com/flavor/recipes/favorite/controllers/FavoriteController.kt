@@ -1,6 +1,7 @@
 package com.flavor.recipes.favorite.controllers
 
 import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
@@ -29,12 +30,12 @@ class FavoriteController {
         @RequestParam page: Int?,
         @RequestParam isDesc: Boolean = false,
         @RequestParam search: String?,
-    ): List<Favorite> {
+    ): List<ListFavoriteDto> {
         if (userId != authentication.principal.toString()) {
             throw BusinessException("User não pode ver os favoritos de outro usuario")
         }
         if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
-        return if (search != null) {
+        val find = if (search != null) {
             favoriteRepository.findByUserIdAndSearch(
                 userId,
                 search,
@@ -56,7 +57,10 @@ class FavoriteController {
                 )
             )
         }
-
+        return find.map {
+            val recipe = recipeRepository.findById(it.recipeId).get()
+            ListFavoriteDto(favorite = it, thumb = recipe.thumb, timePrepared = recipe.timePrepared)
+        }.toList()
     }
 
     @PostMapping("/{userId}")

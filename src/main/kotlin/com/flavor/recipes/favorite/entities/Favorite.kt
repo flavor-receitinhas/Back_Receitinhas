@@ -14,8 +14,6 @@ data class Favorite(
     var userId: String,
     @Column(nullable = false)
     var name: String,
-    @Column(nullable = false)
-    var image: String,
     @Column(name = "created_at", nullable = false)
     var createdAt: Long? = null,
     @Column(name = "updated_at", nullable = false)
