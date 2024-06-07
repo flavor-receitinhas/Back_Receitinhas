@@ -1,7 +1,7 @@
 package com.flavor.recipes.favorite.controllers
 
 import com.flavor.recipes.core.BusinessException
-import com.flavor.recipes.core.HandleException
+import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
@@ -18,6 +18,7 @@ import java.util.*
 class FavoriteController {
     @Autowired
     lateinit var favoriteRepository: FavoriteRepository
+
     @Autowired
     lateinit var recipeRepository: RecipeRepository
 
@@ -29,57 +30,48 @@ class FavoriteController {
         @RequestParam page: Int?,
         @RequestParam isDesc: Boolean = false,
         @RequestParam search: String?,
-    ): ResponseEntity<Any> {
-        return try {
-            if (userId != authentication.principal.toString()) {
-                throw BusinessException("User não pode ver os favoritos de outro usuario")
-            }
-            if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
-            val find = if (search != null) {
-                favoriteRepository.findByUserIdAndSearch(
-                    userId,
-                    search,
-                    PageRequest.of(
-                        page ?: 0,
-                        25,
-                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
-                            Sort.by(sort ?: Favorite::createdAt.name)
-                    )
-                )
-            } else {
-                favoriteRepository.findByUserId(
-                    userId,
-                    PageRequest.of(
-                        page ?: 0,
-                        25,
-                        if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
-                            Sort.by(sort ?: Favorite::createdAt.name)
-                    )
-                )
-            }
-
-            ResponseEntity.ok(find)
-        } catch (e: Exception) {
-            HandleException().handle(e)
+    ): List<ListFavoriteDto> {
+        if (userId != authentication.principal.toString()) {
+            throw BusinessException("User não pode ver os favoritos de outro usuario")
         }
+        if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
+        val find = if (search != null) {
+            favoriteRepository.findByUserIdAndSearch(
+                userId,
+                search,
+                PageRequest.of(
+                    page ?: 0,
+                    25,
+                    if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                        Sort.by(sort ?: Favorite::createdAt.name)
+                )
+            )
+        } else {
+            favoriteRepository.findByUserId(
+                userId,
+                PageRequest.of(
+                    page ?: 0,
+                    25,
+                    if (isDesc) Sort.by(sort ?: Favorite::createdAt.name).descending() else
+                        Sort.by(sort ?: Favorite::createdAt.name)
+                )
+            )
+        }
+        return find.map {
+            val recipe = recipeRepository.findById(it.recipeId).get()
+            ListFavoriteDto(favorite = it, thumb = recipe.thumb, timePrepared = recipe.timePrepared)
+        }.toList()
     }
 
     @PostMapping("/{userId}")
     @ResponseBody
-    fun create(authentication: Authentication, @RequestBody body: Favorite): ResponseEntity<Any> {
-        return try {
-            if (body.userId != authentication.principal.toString()) {
-                throw BusinessException("User do token é diferente do body")
-            }
-            val findRecipe = recipeRepository.findById(body.recipeId)
-            if (!findRecipe.isPresent){
-                throw BusinessException("A receita não existe")
-            }
-            val favorite = favoriteRepository.save(body.copy(createdAt = Date().time, updatedAt = Date().time))
-            ResponseEntity.ok(favorite)
-        } catch (e: Exception) {
-            HandleException().handle(e)
+    fun create(authentication: Authentication, @RequestBody body: Favorite): Favorite {
+        if (body.userId != authentication.principal.toString()) {
+            throw BusinessException("User do token é diferente do body")
         }
+        val recipe = recipeRepository.findById(body.recipeId)
+        if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
+        return favoriteRepository.save(body.copy(createdAt = Date().time, updatedAt = Date().time))
     }
 
     @DeleteMapping("/{userId}/{id}")
@@ -87,20 +79,15 @@ class FavoriteController {
     fun delete(
         authentication: Authentication,
         @PathVariable id: Long,
-    ): ResponseEntity<Any> {
-        return try {
-            val userId = authentication.principal.toString()
-            val find = favoriteRepository.findById(id)
-            if (!find.isPresent) {
-                return ResponseEntity.notFound().build()
-            }
-            if (find.get().userId != userId) {
-                throw BusinessException("User não pode remover dos favoritos")
-            }
-            val result = favoriteRepository.deleteById(id)
-            ResponseEntity.ok(result)
-        } catch (e: Exception) {
-            HandleException().handle(e)
+    ) {
+        val userId = authentication.principal.toString()
+        val find = favoriteRepository.findById(id)
+        if (!find.isPresent) {
+            throw BusinessException("Receita não encontrada")
         }
+        if (find.get().userId != userId) {
+            throw BusinessException("User não pode remover dos favoritos")
+        }
+        return favoriteRepository.deleteById(id)
     }
 }

@@ -13,6 +13,7 @@ data class RecipeEntity(
     val title: String,
     val subTitle: String,
     val images: List<String>,
+    val thumb: String,
     val details: String,
     val timePrepared: Int,
     val difficultyRecipe: DifficultyRecipes,

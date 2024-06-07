@@ -1,7 +1,6 @@
 package com.flavor.recipes.recipe.controller
 
 import com.flavor.recipes.core.BusinessException
-import com.flavor.recipes.core.HandleException
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeRepository
@@ -21,57 +20,42 @@ import org.springframework.web.bind.annotation.PutMapping
 class RecipeController {
     @Autowired
     lateinit var recipeRepository: RecipeRepository
+
     @GetMapping()
-    fun list(authentication: Authentication): ResponseEntity<Any> {
-        try {
-            return ResponseEntity.ok(recipeRepository.findByStatusNot(RecipeStatus.blocked.name));
-        } catch (e: Exception) {
-            return HandleException().handle(e)
-        }
+    fun list(authentication: Authentication): List<RecipeEntity> {
+        return recipeRepository.findByStatusNot(RecipeStatus.blocked.name)
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id: String): ResponseEntity<Any> {
-        try {
-            val recipe = recipeRepository.findById(id)
-            if (!recipe.isPresent) {
-               throw BusinessException("Receita não encontrada")
-            }
-            if (recipe.get().status == RecipeStatus.blocked) {
-                throw BusinessException("Está receita foi bloqueada")
-            }
-
-            return ResponseEntity.ok(recipe.get())
-        } catch (e: Exception) {
-            return HandleException().handle(e)
+    fun get(@PathVariable id: String): RecipeEntity {
+        val recipe = recipeRepository.findById(id)
+        if (!recipe.isPresent) {
+            throw BusinessException("Receita não encontrada")
         }
+        if (recipe.get().status == RecipeStatus.blocked) {
+            throw BusinessException("Está receita foi bloqueada")
+        }
+        return recipe.get()
     }
 
     @PostMapping
-    fun create(@RequestBody body: RecipeEntity): ResponseEntity<Any> {
-        try {
-            if (body.status == RecipeStatus.blocked) {
-                throw BusinessException("Não pode criar uma receita bloqueada")
-            }
-            val result = recipeRepository.save(body)
-            return ResponseEntity.ok(result)
-        } catch (e: Exception) {
-            return HandleException().handle(e)
+    fun create(@RequestBody body: RecipeEntity): RecipeEntity {
+        if (body.status == RecipeStatus.blocked) {
+            throw BusinessException("Não pode criar uma receita bloqueada")
         }
+        return recipeRepository.save(body)
     }
 
     @PutMapping("/{id}")
-    fun update(@RequestBody body: RecipeEntity, @PathVariable id: String): ResponseEntity<Any> {
-        try {
-            if (id != body.id) throw BusinessException("Id path e Id do body diferentes")
-            
-            val recipe = recipeRepository.findById(id)
-            if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
-            if (recipe.get().status == RecipeStatus.blocked) {
-                throw BusinessException("Está receita não pode ser alterada.")
-            }
-
-            val result = recipeRepository.save(recipe.get().copy(
+    fun update(@RequestBody body: RecipeEntity, @PathVariable id: String): RecipeEntity {
+        if (id != body.id) throw BusinessException("Id path e Id do body diferentes")
+        val recipe = recipeRepository.findById(id)
+        if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
+        if (recipe.get().status == RecipeStatus.blocked) {
+            throw BusinessException("Está receita não pode ser alterada.")
+        }
+        return recipeRepository.save(
+            recipe.get().copy(
                 details = body.details,
                 difficultyRecipe = body.difficultyRecipe,
                 images = body.images,
@@ -83,11 +67,8 @@ class RecipeController {
                 timePrepared = body.timePrepared,
                 title = body.title,
                 status = body.status
-            ))
-            return ResponseEntity.ok(result)
-        } catch (e: Exception) {
-            return HandleException().handle(e)
-        }
+            )
+        )
     }
 
 }
