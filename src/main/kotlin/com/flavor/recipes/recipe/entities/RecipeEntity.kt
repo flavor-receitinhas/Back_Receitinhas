@@ -11,6 +11,7 @@ data class RecipeEntity(
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     val id: String?,
     val title: String,
+    val userId: String,
     val subTitle: String,
     val images: List<String>,
     val thumb: String,
