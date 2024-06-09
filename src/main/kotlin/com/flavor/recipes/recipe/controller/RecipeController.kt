@@ -4,6 +4,8 @@ import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import io.swagger.v3.oas.annotations.responses.ApiResponse
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.PutMapping
 
 @RestController
 @RequestMapping("/recipe")
+@Tag(name = "Recipe")
 class RecipeController {
     @Autowired
     lateinit var recipeRepository: RecipeRepository

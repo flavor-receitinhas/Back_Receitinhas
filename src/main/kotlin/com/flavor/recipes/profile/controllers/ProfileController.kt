@@ -5,6 +5,7 @@ import com.flavor.recipes.profile.dtos.ProfileNameDto
 import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.profile.repositories.BucketRepository
 import com.flavor.recipes.profile.repositories.ProfileRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
@@ -15,6 +16,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/profile")
+@Tag(name = "Profile")
 class ProfileController {
     @Autowired
     lateinit var profileRepository: ProfileRepository
