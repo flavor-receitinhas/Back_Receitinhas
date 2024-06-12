@@ -3,6 +3,7 @@ package com.flavor.recipes.recipe.entities
 import com.flavor.recipes.user.entities.DifficultyRecipes
 import jakarta.persistence.*
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.Field
 
 
 @Document(collection = "recipe")
@@ -23,4 +24,8 @@ data class RecipeEntity(
     val serveFood: String,
     val ingredients: Set<RecipeIngredientEntity>,
     val status: RecipeStatus,
+    @Field(name = "created_at")
+    var createdAt: Long? = null,
+    @Field(name = "updated_at")
+    var updatedAt: Long? = null,
 )

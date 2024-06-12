@@ -5,12 +5,12 @@ import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
-import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.util.*
 
@@ -26,14 +26,14 @@ class FavoriteController {
 
     @GetMapping("/{userId}")
     fun list(
-        authentication: Authentication,
+        @AuthenticationPrincipal user: UserEntity,
         @PathVariable userId: String,
         @RequestParam sort: String?,
         @RequestParam page: Int?,
         @RequestParam isDesc: Boolean = false,
         @RequestParam search: String?,
     ): List<ListFavoriteDto> {
-        if (userId != authentication.principal.toString()) {
+        if (userId != user.id) {
             throw BusinessException("User não pode ver os favoritos de outro usuario")
         }
         if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
@@ -67,8 +67,8 @@ class FavoriteController {
 
     @PostMapping("/{userId}")
     @ResponseBody
-    fun create(authentication: Authentication, @RequestBody body: Favorite): Favorite {
-        if (body.userId != authentication.principal.toString()) {
+    fun create(@AuthenticationPrincipal user: UserEntity, @RequestBody body: Favorite): Favorite {
+        if (body.userId != user.id) {
             throw BusinessException("User do token é diferente do body")
         }
         val recipe = recipeRepository.findById(body.recipeId)
@@ -79,15 +79,14 @@ class FavoriteController {
     @DeleteMapping("/{userId}/{id}")
     @ResponseBody
     fun delete(
-        authentication: Authentication,
+        @AuthenticationPrincipal user: UserEntity,
         @PathVariable id: Long,
     ) {
-        val userId = authentication.principal.toString()
         val find = favoriteRepository.findById(id)
         if (!find.isPresent) {
             throw BusinessException("Receita não encontrada")
         }
-        if (find.get().userId != userId) {
+        if (find.get().userId != user.id) {
             throw BusinessException("User não pode remover dos favoritos")
         }
         return favoriteRepository.deleteById(id)

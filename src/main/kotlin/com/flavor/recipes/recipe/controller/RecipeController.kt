@@ -6,6 +6,7 @@ import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import com.flavor.recipes.recipe.services.RecipeService
 import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -15,33 +16,55 @@ import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.security.core.Authentication
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
+import org.springframework.web.bind.annotation.RequestParam
 
 @RestController
 @RequestMapping("/recipe")
 @Tag(name = "Recipe")
 class RecipeController {
     @Autowired
-    lateinit var recipeRepository: RecipeRepository
+    lateinit var recipeService: RecipeService
 
-    @GetMapping()
-    fun list(authentication: Authentication): List<RecipeEntity> {
-        return recipeRepository.findByStatusNot(RecipeStatus.blocked.name)
+    @GetMapping
+    fun list(
+        @RequestParam isDesc: Boolean?,
+        @RequestParam page: Int?,
+        @RequestParam sort: String?
+    ): List<RecipeEntity> {
+        return recipeService.findByStatusNot(
+            RecipeStatus.blocked.name, isDesc = isDesc ?: true,
+            page = page ?: 0,
+            sort = sort ?: RecipeEntity::createdAt.name
+        )
     }
+
+    @GetMapping("/user/{id}")
+    fun findByUser(
+        @PathVariable userId: String,
+        @RequestParam isDesc: Boolean?,
+        @RequestParam page: Int?,
+        @RequestParam sort: String?
+    ): List<RecipeEntity> {
+        return recipeService.findByUser(
+            userId = userId,
+            isDesc = isDesc ?: true,
+            page = page ?: 0,
+            sort = sort ?: RecipeEntity::createdAt.name
+        )
+    }
+
 
     @GetMapping("/{id}")
     fun get(@PathVariable id: String): RecipeEntity {
-        val recipe = recipeRepository.findById(id)
-        if (!recipe.isPresent) {
-            throw BusinessException("Receita não encontrada")
-        }
-        if (recipe.get().status == RecipeStatus.blocked) {
+        val recipe = recipeService.findById(id)
+            ?: throw BusinessException("Receita não encontrada")
+        if (recipe.status == RecipeStatus.blocked) {
             throw BusinessException("Está receita foi bloqueada")
         }
-        return recipe.get()
+        return recipe
     }
 
     @PostMapping
@@ -49,7 +72,7 @@ class RecipeController {
         if (body.status == RecipeStatus.blocked) {
             throw BusinessException("Não pode criar uma receita bloqueada")
         }
-        return recipeRepository.save(
+        return recipeService.create(
             RecipeEntity(
                 details = body.details,
                 difficultyRecipe = body.difficultyRecipe,
@@ -70,13 +93,13 @@ class RecipeController {
 
     @PutMapping("/{id}")
     fun update(@RequestBody body: RecipeUpdateDto, @PathVariable id: String): RecipeEntity {
-        val recipe = recipeRepository.findById(id)
-        if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
-        if (recipe.get().status == RecipeStatus.blocked) {
+        val recipe = recipeService.findById(id)
+            ?: throw BusinessException("Receita não encontrada")
+        if (recipe.status == RecipeStatus.blocked) {
             throw BusinessException("Está receita não pode ser alterada.")
         }
-        return recipeRepository.save(
-            recipe.get().copy(
+        return recipeService.update(
+            recipe.copy(
                 details = body.details,
                 difficultyRecipe = body.difficultyRecipe,
                 ingredients = body.ingredients,
