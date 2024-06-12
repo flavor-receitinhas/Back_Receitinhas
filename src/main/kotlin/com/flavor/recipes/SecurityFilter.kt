@@ -12,11 +12,13 @@ import org.springframework.security.oauth2.server.resource.authentication.Bearer
 import org.springframework.security.oauth2.server.resource.authentication.BearerTokenAuthenticationToken
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken
 import org.springframework.stereotype.Component
+import org.springframework.stereotype.Service
 import org.springframework.web.filter.OncePerRequestFilter
 import java.io.IOException
 
 
 @Component
+@Service
 class SecurityFilter : OncePerRequestFilter() {
     @Autowired
     lateinit var tokenService: TokenService
@@ -28,14 +30,12 @@ class SecurityFilter : OncePerRequestFilter() {
         filterChain: FilterChain
     ) {
         val token = recoverToken(request)
-        if (token != null) {
-            val login = tokenService.validateToken(token.toString())
-            if (login != null) {
-                val authentication = UsernamePasswordAuthenticationToken(login,"", listOf())
-                val context = SecurityContextHolder.getContext()
-                context.authentication = authentication
-                SecurityContextHolder.setContext(context)
-            }
+        val userId = tokenService.validateToken(token)
+        if (userId != null) {
+            val authentication = UsernamePasswordAuthenticationToken(userId, "", listOf())
+            val context = SecurityContextHolder.getContext()
+            context.authentication = authentication
+            SecurityContextHolder.setContext(context)
         }
         filterChain.doFilter(request, response)
     }
