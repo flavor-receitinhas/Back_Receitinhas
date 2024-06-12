@@ -9,7 +9,7 @@ import org.springframework.data.mongodb.core.mapping.Document
 data class RecipeEntity(
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    val id: String?,
+    val id: String? = null,
     val title: String,
     val userId: String,
     val subTitle: String,

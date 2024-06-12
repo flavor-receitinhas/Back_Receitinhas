@@ -1,17 +1,20 @@
 package com.flavor.recipes.recipe.controller
 
 import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import com.flavor.recipes.user.entities.UserEntity
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestBody
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 
@@ -39,16 +42,31 @@ class RecipeController {
     }
 
     @PostMapping
-    fun create(@RequestBody body: RecipeEntity): RecipeEntity {
+    fun create(@RequestBody body: RecipeCreateDto, @AuthenticationPrincipal user: UserEntity): RecipeEntity {
         if (body.status == RecipeStatus.blocked) {
             throw BusinessException("Não pode criar uma receita bloqueada")
         }
-        return recipeRepository.save(body)
+        return recipeRepository.save(
+            RecipeEntity(
+                details = body.details,
+                difficultyRecipe = body.difficultyRecipe,
+                ingredients = body.ingredients,
+                instruction = body.instruction,
+                portion = body.portion,
+                serveFood = body.serveFood,
+                subTitle = body.subTitle,
+                timePrepared = body.timePrepared,
+                title = body.title,
+                status = body.status,
+                userId = user.id,
+                images = emptyList(),
+                thumb = ""
+            )
+        )
     }
 
     @PutMapping("/{id}")
-    fun update(@RequestBody body: RecipeEntity, @PathVariable id: String): RecipeEntity {
-        if (id != body.id) throw BusinessException("Id path e Id do body diferentes")
+    fun update(@RequestBody body: RecipeUpdateDto, @PathVariable id: String): RecipeEntity {
         val recipe = recipeRepository.findById(id)
         if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
         if (recipe.get().status == RecipeStatus.blocked) {
@@ -58,7 +76,6 @@ class RecipeController {
             recipe.get().copy(
                 details = body.details,
                 difficultyRecipe = body.difficultyRecipe,
-                images = body.images,
                 ingredients = body.ingredients,
                 instruction = body.instruction,
                 portion = body.portion,
