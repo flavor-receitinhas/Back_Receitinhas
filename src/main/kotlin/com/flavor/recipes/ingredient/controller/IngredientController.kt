@@ -2,6 +2,7 @@ package com.flavor.recipes.ingredient.controller
 
 import com.flavor.recipes.ingredient.entities.IngredientEntity
 import com.flavor.recipes.ingredient.repository.IngredientRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
@@ -15,6 +16,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/ingredient")
+@Tag(name = "Ingredient")
 class IngredientController(@Autowired private val ingredientRepository: IngredientRepository) {
 
     @GetMapping()
@@ -36,7 +38,7 @@ class IngredientController(@Autowired private val ingredientRepository: Ingredie
     }
 
     @PutMapping
-    fun updateIngredient(){
+    fun updateIngredient() {
 
     }
 

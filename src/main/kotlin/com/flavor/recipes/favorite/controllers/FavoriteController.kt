@@ -5,6 +5,7 @@ import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
@@ -15,6 +16,7 @@ import java.util.*
 
 @RestController
 @RequestMapping("/favorite")
+@Tag(name = "Favorite")
 class FavoriteController {
     @Autowired
     lateinit var favoriteRepository: FavoriteRepository
