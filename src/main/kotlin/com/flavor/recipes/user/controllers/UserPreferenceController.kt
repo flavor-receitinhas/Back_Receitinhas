@@ -2,6 +2,7 @@ package com.flavor.recipes.user.controllers
 
 import com.flavor.recipes.user.entities.UserPreference
 import com.flavor.recipes.user.repositories.UserPreferenceRepository
+import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.GetMapping
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/v1/user")
+@Tag(name = "User Preference")
 class UserPreferenceController {
     @Autowired
     lateinit var repository: UserPreferenceRepository
