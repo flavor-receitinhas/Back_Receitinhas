@@ -1,12 +1,12 @@
 package com.flavor.recipes.recipe.dtos
 
-import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.user.entities.DifficultyRecipes
 
-class RecipeCreateDto(
+data class RecipeUpdateDto(
     val title: String,
+    val userId: String,
     val subTitle: String,
     val details: String,
     val timePrepared: Int,
