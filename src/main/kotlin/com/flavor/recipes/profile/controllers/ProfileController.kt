@@ -5,10 +5,12 @@ import com.flavor.recipes.profile.dtos.ProfileNameDto
 import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.profile.repositories.BucketRepository
 import com.flavor.recipes.profile.repositories.ProfileRepository
+import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.ResponseEntity
 import org.springframework.security.core.Authentication
+import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
 import java.util.*
@@ -29,7 +31,7 @@ class ProfileController {
 
     @GetMapping("/{userID}")
     @ResponseBody
-    fun getProfile(authentication: Authentication, @PathVariable userID: String): ProfileEntity {
+    fun getProfile(@PathVariable userID: String): ProfileEntity {
         return profileRepository.findByUserID(userID)
             ?: return createProfile(userID = userID)
     }
@@ -37,7 +39,6 @@ class ProfileController {
     @PostMapping("/{userID}")
     @ResponseBody
     fun updateProfile(
-        authentication: Authentication,
         @RequestBody body: ProfileEntity,
         @PathVariable userID: String,
     ): ProfileEntity {
