@@ -41,7 +41,7 @@ class RecipeController {
         )
     }
 
-    @GetMapping("/user/{id}")
+    @GetMapping("/user/{userId}")
     fun findByUser(
         @PathVariable userId: String,
         @RequestParam isDesc: Boolean?,
