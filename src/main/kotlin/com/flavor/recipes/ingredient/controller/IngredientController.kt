@@ -52,7 +52,7 @@ class IngredientController(@Autowired private val ingredientRepository: Ingredie
         return ingredientRepository.save(find.get().copy(name = ingredient.name))
     }
 
-    @DeleteMapping("{id}")
+    @DeleteMapping("/{id}")
     fun delete(@PathVariable("id") id: String) {
         return ingredientRepository.deleteById(id)
     }
