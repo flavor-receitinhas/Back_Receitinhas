@@ -34,16 +34,6 @@ services:
       - rede-default
     ports:
       - 80:80
-  mongo:
-    image: mongo:7.0.0
-    restart: always
-    environment:
-      MONGO_INITDB_ROOT_USERNAME: root
-      MONGO_INITDB_ROOT_PASSWORD: ${MONGO_PASSWORD}
-    networks:
-      - rede-default
-    ports:
-      - "27017:27017"
 networks:
   rede-default:
 
@@ -51,5 +41,5 @@ networks:
 volumes:
   mariadb:
 
-    # compose up -d --build --remove-orphans
-    # .\gradlew build -x test
+  # compose up -d --build --remove-orphans
+  # .\gradlew build -x test
