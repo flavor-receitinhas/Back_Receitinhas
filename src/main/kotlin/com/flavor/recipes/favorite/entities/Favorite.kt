@@ -1,6 +1,7 @@
 package com.flavor.recipes.favorite.entities
 
 import jakarta.persistence.*
+import java.sql.Timestamp
 
 @Entity
 @Table(name = "favorite")
@@ -15,7 +16,7 @@ data class Favorite(
     @Column(nullable = false)
     var name: String,
     @Column(name = "created_at", nullable = false)
-    var createdAt: Long? = null,
+    var createdAt: Timestamp,
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: Long? = null,
+    var updatedAt: Timestamp,
 )

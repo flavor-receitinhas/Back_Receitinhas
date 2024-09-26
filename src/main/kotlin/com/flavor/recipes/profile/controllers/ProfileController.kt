@@ -10,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.sql.Timestamp
 import java.util.*
 
 
@@ -59,7 +60,7 @@ class ProfileController {
             bucketRepository.saveImage(userId, file)
             image = bucketRepository.getLinkImage(userId)
         }
-        return profileService.save(find.copy(image = image, updatedAt = Date().time))
+        return profileService.save(find.copy(image = image, updatedAt = Timestamp.from(Date().toInstant())))
     }
 
 
@@ -76,7 +77,7 @@ class ProfileController {
         return profileService.save(
             userFind.copy(
                 name = profileName.name,
-                updatedAt = Date().time
+                updatedAt = Timestamp.from(Date().toInstant())
             )
         )
     }

@@ -5,6 +5,7 @@ import com.flavor.recipes.profile.repositories.ProfileRepository
 import com.flavor.recipes.recipe.services.RecipeService
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.stereotype.Service
+import java.sql.Timestamp
 import java.util.*
 
 @Service
@@ -17,8 +18,9 @@ class ProfileService {
 
     fun byId(userId: String, name: String? = null): ProfileEntity {
         val recipes = recipeService.countByUser(userId)
-        return profileRepository.findByUserID(userId)
-            ?: return createProfile(userId = userId).copy(totalRecipes = recipes)
+        val profile = profileRepository.findByUserId(userId)
+            ?: return createProfile(userId = userId)
+        return profile.copy(totalRecipes = recipes)
     }
 
 
@@ -29,16 +31,16 @@ class ProfileService {
     fun save(profile: ProfileEntity): ProfileEntity {
         return profileRepository.save(
             profile.copy(
-                updatedAt = Date().time
+                updatedAt = Timestamp.from(Date().toInstant())
             )
         )
     }
 
     private fun createProfile(userId: String, name: String? = null): ProfileEntity {
         val profile = ProfileEntity(
-            updatedAt = Date().time,
+            updatedAt = Timestamp.from(Date().toInstant()),
             biography = "",
-            createdAt = Date().time,
+            createdAt = Timestamp.from(Date().toInstant()),
             userId = userId,
             image = null,
             name = name,

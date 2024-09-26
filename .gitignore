@@ -38,3 +38,5 @@ out/
 src/main/resources/adc.json
 .env
 create.sql
+src/main/resources/chave_privada_perfil_oracle.pem
+src/main/resources/config

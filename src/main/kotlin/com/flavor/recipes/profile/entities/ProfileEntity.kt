@@ -2,6 +2,7 @@ package com.flavor.recipes.profile.entities
 
 import jakarta.persistence.*
 import org.hibernate.annotations.UuidGenerator
+import java.sql.Timestamp
 
 @Entity
 @Table(name = "profile")
@@ -16,9 +17,9 @@ data class ProfileEntity(
     @Column(name = "user_id", unique = true, nullable = false)
     var userId: String = "",
     @Column(name = "created_at", nullable = false)
-    var createdAt: Long = 0,
+    var createdAt: Timestamp,
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: Long = 0,
+    var updatedAt: Timestamp,
     @Column(columnDefinition = "TEXT")
     var image: String?,
     @Column(name = "total_recipes", nullable = false)

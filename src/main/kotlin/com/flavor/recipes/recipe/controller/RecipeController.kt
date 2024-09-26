@@ -20,6 +20,8 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PutMapping
 import org.springframework.web.bind.annotation.RequestParam
+import java.sql.Timestamp
+import java.util.Date
 
 @RestController
 @RequestMapping("/recipe")
@@ -86,7 +88,9 @@ class RecipeController {
                 status = body.status,
                 userId = user.id,
                 images = emptyList(),
-                thumb = ""
+                thumb = "",
+                createdAt = Timestamp.from(Date().toInstant()),
+                updatedAt = Timestamp.from(Date().toInstant())
             )
         )
     }
