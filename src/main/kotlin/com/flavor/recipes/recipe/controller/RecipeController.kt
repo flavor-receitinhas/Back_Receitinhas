@@ -1,25 +1,21 @@
 package com.flavor.recipes.recipe.controller
 
 import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
+import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
 import com.flavor.recipes.recipe.services.RecipeService
 import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
 import org.springframework.security.core.annotation.AuthenticationPrincipal
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestParam
+import org.springframework.web.bind.annotation.*
+import org.springframework.web.multipart.MultipartFile
 import java.sql.Timestamp
 import java.util.Date
 
@@ -74,48 +70,25 @@ class RecipeController {
         if (body.status == RecipeStatus.blocked) {
             throw BusinessException("Não pode criar uma receita bloqueada")
         }
-        return recipeService.create(
-            RecipeEntity(
-                details = body.details,
-                difficultyRecipe = body.difficultyRecipe,
-                ingredients = body.ingredients,
-                instruction = body.instruction,
-                portion = body.portion,
-                serveFood = body.serveFood,
-                subTitle = body.subTitle,
-                timePrepared = body.timePrepared,
-                title = body.title,
-                status = body.status,
-                userId = user.id,
-                images = emptyList(),
-                thumb = "",
-                createdAt = Timestamp.from(Date().toInstant()),
-                updatedAt = Timestamp.from(Date().toInstant())
-            )
-        )
+        return recipeService.create(body, user.id)
     }
 
     @PutMapping("/{id}")
     fun update(@RequestBody body: RecipeUpdateDto, @PathVariable id: String): RecipeEntity {
-        val recipe = recipeService.findById(id)
-            ?: throw BusinessException("Receita não encontrada")
-        if (recipe.status == RecipeStatus.blocked) {
-            throw BusinessException("Está receita não pode ser alterada.")
-        }
-        return recipeService.update(
-            recipe.copy(
-                details = body.details,
-                difficultyRecipe = body.difficultyRecipe,
-                ingredients = body.ingredients,
-                instruction = body.instruction,
-                portion = body.portion,
-                serveFood = body.serveFood,
-                subTitle = body.subTitle,
-                timePrepared = body.timePrepared,
-                title = body.title,
-                status = body.status
-            )
-        )
+        return recipeService.update(body, id)
+    }
+
+    @PutMapping("/{recipeId}/images")
+    fun createFile(
+        @RequestPart file: MultipartFile,
+        @PathVariable recipeId: String,
+    ) {
+        return recipeService.createImage(recipeId, file)
+    }
+
+    @PutMapping("/{recipeId}/images/{imageId}")
+    fun deleteFile(@PathVariable imageId: String) {
+        return recipeService.deleteImage(imageId)
     }
 
 }

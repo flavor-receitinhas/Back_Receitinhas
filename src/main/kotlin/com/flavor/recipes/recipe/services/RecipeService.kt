@@ -1,17 +1,31 @@
 package com.flavor.recipes.recipe.services
 
+import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
+import com.flavor.recipes.recipe.entities.RecipeImageEntity
+import com.flavor.recipes.recipe.entities.RecipeStatus
+import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
+import com.flavor.recipes.recipe.repositories.RecipeImageRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.stereotype.Service
+import org.springframework.web.multipart.MultipartFile
 import java.sql.Timestamp
 import java.util.Date
 import kotlin.jvm.optionals.getOrNull
 
 @Service
 class RecipeService {
+    @Autowired
+    lateinit var recipeImageRepository: RecipeImageRepository
+
+    @Autowired
+    lateinit var recipeBucketRepository: RecipeBucketRepository
+
     @Autowired
     lateinit var recipeRepository: RecipeRepository
     fun findByUser(
@@ -54,20 +68,78 @@ class RecipeService {
         return recipeRepository.countByUser(userId)
     }
 
-    fun create(entity: RecipeEntity): RecipeEntity {
+    fun create(dto: RecipeCreateDto, userId: String): RecipeEntity {
         return recipeRepository.save(
-            entity.copy(
+            RecipeEntity(
+                details = dto.details,
+                difficultyRecipe = dto.difficultyRecipe,
+                ingredients = dto.ingredients,
+                instruction = dto.instruction,
+                portion = dto.portion,
+                serveFood = dto.serveFood,
+                subTitle = dto.subTitle,
+                timePrepared = dto.timePrepared,
+                title = dto.title,
+                status = dto.status,
+                userId = userId,
+                images = emptyList(),
+                thumb = "",
                 createdAt = Timestamp.from(Date().toInstant()),
                 updatedAt = Timestamp.from(Date().toInstant())
             )
         )
     }
 
-    fun update(entity: RecipeEntity): RecipeEntity {
+    fun update(dto: RecipeUpdateDto, id: String): RecipeEntity {
+        val recipe = recipeRepository.findById(id).getOrNull()
+            ?: throw BusinessException("Receita não encontrada")
+        if (recipe.status == RecipeStatus.blocked) {
+            throw BusinessException("Está receita não pode ser alterada.")
+        }
         return recipeRepository.save(
-            entity.copy(
+            recipe.copy(
+                details = dto.details,
+                difficultyRecipe = dto.difficultyRecipe,
+                ingredients = dto.ingredients,
+                instruction = dto.instruction,
+                portion = dto.portion,
+                serveFood = dto.serveFood,
+                subTitle = dto.subTitle,
+                timePrepared = dto.timePrepared,
+                title = dto.title,
+                status = dto.status,
                 updatedAt = Timestamp.from(Date().toInstant())
             )
         )
+    }
+
+    fun createImage(id: String, file: MultipartFile) {
+        val recipe = recipeRepository.findById(id).getOrNull()
+            ?: throw BusinessException("Receita não encontrada")
+        val quantity = recipeImageRepository.countByRecipeId(recipe.id!!)
+        if (quantity > 10) throw BusinessException("Receita só pode ter 10 imagens")
+        val image = recipeImageRepository.save(
+            RecipeImageEntity(
+                recipeId = recipe.id
+            )
+        )
+        recipeBucketRepository.saveImage(image.id!!, file)
+        val linkImage = recipeBucketRepository.getLinkImage(image.id)
+        recipeImageRepository.save(
+            image.copy(
+                size = file.size,
+                name = file.name,
+                link = linkImage,
+                type = file.contentType ?: "n/a"
+            )
+        )
+    }
+
+
+    fun deleteImage(id: String) {
+        recipeImageRepository.findById(id).getOrNull()
+            ?: throw BusinessException("Imagem não encontrada")
+        recipeBucketRepository.deleteImage(id)
+        recipeImageRepository.deleteById(id)
     }
 }
