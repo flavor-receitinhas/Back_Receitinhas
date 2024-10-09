@@ -12,6 +12,7 @@ data class IngredientEntity(
     @UuidGenerator
     @Column(name = "id", updatable = false, unique = true, nullable = false)
     val id: String? = null,
+    @Column(name = "name", unique = true, nullable = false)
     val name: String,
     val description: String = ""
 )

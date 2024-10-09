@@ -1,22 +1,27 @@
 package com.flavor.recipes.profile.entities
 
 import jakarta.persistence.*
+import org.hibernate.annotations.UuidGenerator
+import java.sql.Timestamp
 
 @Entity
 @Table(name = "profile")
 data class ProfileEntity(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private var id: Long? = null,
+    @UuidGenerator
+    @Column(name = "id", updatable = false, unique = true, nullable = false)
+    var id: String? = null,
     @Column(name = "name", unique = true)
     var name: String?,
     var biography: String? = null,
     @Column(name = "user_id", unique = true, nullable = false)
-    var userID: String = "",
+    var userId: String = "",
     @Column(name = "created_at", nullable = false)
-    var createdAt: Long? = null,
+    var createdAt: Timestamp,
     @Column(name = "updated_at", nullable = false)
-    var updatedAt: Long?,
+    var updatedAt: Timestamp,
     @Column(columnDefinition = "TEXT")
-    var image: String?
+    var image: String?,
+    @Column(name = "total_recipes", nullable = false)
+    var totalRecipes: Int = 0
 )

@@ -12,6 +12,7 @@ import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
+import java.sql.Timestamp
 import java.util.*
 
 @RestController
@@ -61,7 +62,11 @@ class FavoriteController {
         }
         return find.map {
             val recipe = recipeRepository.findById(it.recipeId).get()
-            ListFavoriteDto(favorite = it, thumb = recipe.thumb, timePrepared = recipe.timePrepared)
+            ListFavoriteDto(
+                favorite = it,
+                thumb = recipe.thumb,
+                timePrepared = recipe.timePrepared
+            )
         }.toList()
     }
 
@@ -73,7 +78,12 @@ class FavoriteController {
         }
         val recipe = recipeRepository.findById(body.recipeId)
         if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
-        return favoriteRepository.save(body.copy(createdAt = Date().time, updatedAt = Date().time))
+        return favoriteRepository.save(
+            body.copy(
+                createdAt = Timestamp.from(Date().toInstant()),
+                updatedAt = Timestamp.from(Date().toInstant())
+            )
+        )
     }
 
     @DeleteMapping("/{userId}/{id}")

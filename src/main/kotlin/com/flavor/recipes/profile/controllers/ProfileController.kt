@@ -3,16 +3,14 @@ package com.flavor.recipes.profile.controllers
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.profile.dtos.ProfileNameDto
 import com.flavor.recipes.profile.entities.ProfileEntity
-import com.flavor.recipes.profile.repositories.BucketRepository
-import com.flavor.recipes.profile.repositories.ProfileRepository
-import com.flavor.recipes.user.entities.UserEntity
+import com.flavor.recipes.profile.entities.UpdateProfileDto
+import com.flavor.recipes.profile.repositories.ProfileBucketRepository
+import com.flavor.recipes.profile.services.ProfileService
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.http.ResponseEntity
-import org.springframework.security.core.Authentication
-import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
+import java.sql.Timestamp
 import java.util.*
 
 
@@ -20,87 +18,69 @@ import java.util.*
 @RequestMapping("/profile")
 @Tag(name = "Profile")
 class ProfileController {
-    @Autowired
-    lateinit var profileRepository: ProfileRepository
+
 
     @Autowired
-    lateinit var bucketRepository: BucketRepository
+    lateinit var profileService: ProfileService
 
-    val LIMIT_FILE_SIZE = 3000000
-    val TYPE_CONTENT_IMAGE = listOf("JPG", "GIF", "PNG", "JPEG")
+    @Autowired
+    lateinit var bucketRepository: ProfileBucketRepository
 
-    @GetMapping("/{userID}")
+
+    @GetMapping("/{userId}")
     @ResponseBody
-    fun getProfile(@PathVariable userID: String): ProfileEntity {
-        return profileRepository.findByUserID(userID)
-            ?: return createProfile(userID = userID)
+    fun getProfile(@PathVariable userId: String): ProfileEntity {
+        return profileService.byId(userId)
     }
 
-    @PostMapping("/{userID}")
+    @PostMapping("/{userId}")
     @ResponseBody
     fun updateProfile(
-        @RequestBody body: ProfileEntity,
-        @PathVariable userID: String,
+        @RequestBody body: UpdateProfileDto,
+        @PathVariable userId: String,
     ): ProfileEntity {
         if ((body.name?.isBlank() == true)) throw BusinessException("Nome não pode ser vazio")
-        val find = profileRepository.findByUserID(userID)
-            ?: throw BusinessException("Perfil não encontrado")
-        return profileRepository.save(
+        val find = profileService.byId(userId, body.name)
+        return profileService.save(
             find.copy(
                 biography = body.biography,
-                updatedAt = Date().time,
                 name = body.name,
             )
         )
     }
 
-    @PutMapping("/{userID}/image")
+    @PutMapping("/{userId}/image")
     fun handleFileUpload(
         @RequestPart file: MultipartFile?,
-        @PathVariable userID: String,
+        @PathVariable userId: String,
     ): ProfileEntity {
         var image: String? = null
-        val find: ProfileEntity =
-            profileRepository.findByUserID(userID) ?: throw BusinessException("Perfil não encontrado")
+        val find = profileService.byId(userId)
         if (file != null) {
-            validateImage(file)
-            bucketRepository.saveImage(userID, file.bytes, file.contentType!!)
-            image = bucketRepository.getLinkImage(userID)
+            bucketRepository.saveImage(userId, file)
+            image = bucketRepository.getLinkImage(userId)
         }
-        return profileRepository.save(find.copy(image = image, updatedAt = Date().time))
+        return profileService.save(find.copy(image = image, updatedAt = Timestamp.from(Date().toInstant())))
     }
 
-    private fun validateImage(file: MultipartFile) {
-        if (file.size > LIMIT_FILE_SIZE) throw BusinessException("Imagem maior que o permetido: 3mb")
-        val typeImage = file.contentType!!.replace("image/", "").uppercase()
-        if (!TYPE_CONTENT_IMAGE.contains(typeImage)) throw BusinessException("Tipo de arquivo não permitido.")
-    }
 
-    @PutMapping("/{userID}/name")
+    @PutMapping("/{userId}/name")
     fun updateName(
         @RequestBody profileName: ProfileNameDto,
-        @PathVariable userID: String,
+        @PathVariable userId: String,
     ): ProfileEntity {
-        val find = profileRepository.findByName(profileName.name)
+        val find = profileService.findByName(profileName.name)
         if (find != null) {
             throw BusinessException("Esse nome ja está em uso, tente outro")
         }
-        val userFind = profileRepository.findByUserID(userID)
-        if (userFind == null) {
-            return createProfile(userID, profileName.name)
-        }
-        return profileRepository.save(userFind.copy(name = profileName.name, updatedAt = Date().time))
+        val userFind = profileService.byId(userId, profileName.name)
+        return profileService.save(
+            userFind.copy(
+                name = profileName.name,
+                updatedAt = Timestamp.from(Date().toInstant())
+            )
+        )
     }
 
-    private fun createProfile(userID: String, name: String? = null): ProfileEntity {
-        val profile = ProfileEntity(
-            updatedAt = Date().time,
-            biography = "",
-            createdAt = Date().time,
-            userID = userID,
-            image = null,
-            name = name,
-        )
-        return profileRepository.save(profile)
-    }
+
 }

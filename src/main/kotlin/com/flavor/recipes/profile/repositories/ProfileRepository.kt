@@ -6,6 +6,7 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface ProfileRepository : JpaRepository<ProfileEntity, Long> {
-    fun findByUserID(userID: String): ProfileEntity?
+    fun findByUserId(userId: String): ProfileEntity?
     fun findByName(name: String): ProfileEntity?
+
 }
