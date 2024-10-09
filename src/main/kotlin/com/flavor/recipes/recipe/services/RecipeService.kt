@@ -64,6 +64,10 @@ class RecipeService {
         return recipeRepository.findById(id).getOrNull()
     }
 
+    fun findAllImages(recipeId: String): List<RecipeImageEntity> {
+        return recipeImageRepository.findByRecipeId(recipeId)
+    }
+
     fun countByUser(userId: String): Int {
         return recipeRepository.countByUser(userId)
     }
@@ -82,8 +86,6 @@ class RecipeService {
                 title = dto.title,
                 status = dto.status,
                 userId = userId,
-                images = emptyList(),
-                thumb = "",
                 createdAt = Timestamp.from(Date().toInstant()),
                 updatedAt = Timestamp.from(Date().toInstant())
             )
@@ -113,11 +115,18 @@ class RecipeService {
         )
     }
 
-    fun createImage(id: String, file: MultipartFile) {
+    fun createImage(id: String, file: MultipartFile, isThumb: Boolean = false) {
         val recipe = recipeRepository.findById(id).getOrNull()
             ?: throw BusinessException("Receita não encontrada")
-        val quantity = recipeImageRepository.countByRecipeId(recipe.id!!)
-        if (quantity > 10) throw BusinessException("Receita só pode ter 10 imagens")
+
+        if (isThumb) {
+            val quantity = recipeImageRepository.countByRecipeIdAndThumb(recipe.id!!, true)
+            if (quantity > 1) throw BusinessException("Receita só pode ter uma capa")
+        } else {
+            val quantity = recipeImageRepository.countByRecipeId(recipe.id!!)
+            if (quantity > 10) throw BusinessException("Receita só pode ter 10 imagens")
+        }
+
         val image = recipeImageRepository.save(
             RecipeImageEntity(
                 recipeId = recipe.id
@@ -130,7 +139,8 @@ class RecipeService {
                 size = file.size,
                 name = file.name,
                 link = linkImage,
-                type = file.contentType ?: "n/a"
+                type = file.contentType ?: "n/a",
+                thumb = isThumb
             )
         )
     }

@@ -18,8 +18,6 @@ data class RecipeEntity(
     val userId: String,
     @Column(name = "sub_title", nullable = false)
     val subTitle: String,
-    val images: List<String>,
-    val thumb: String,
     val details: String,
     @Column(name = "time_prepared", nullable = false)
     val timePrepared: Int,

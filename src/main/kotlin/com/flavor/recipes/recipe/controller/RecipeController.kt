@@ -5,6 +5,7 @@ import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
+import com.flavor.recipes.recipe.entities.RecipeImageEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
@@ -89,6 +90,26 @@ class RecipeController {
     @PutMapping("/{recipeId}/images/{imageId}")
     fun deleteFile(@PathVariable imageId: String) {
         return recipeService.deleteImage(imageId)
+    }
+
+    @PutMapping("/{recipeId}/thumbs")
+    fun createThumbs(
+        @RequestPart file: MultipartFile,
+        @PathVariable recipeId: String,
+    ) {
+        return recipeService.createImage(recipeId, file, true)
+    }
+
+    @PutMapping("/{recipeId}/thumbs/{imageId}")
+    fun deleteThumbs(@PathVariable imageId: String) {
+        return recipeService.deleteImage(imageId)
+    }
+
+    @GetMapping("/{recipeId}/images")
+    fun getImages(
+        @PathVariable recipeId: String,
+    ): List<RecipeImageEntity> {
+        return recipeService.findAllImages(recipeId)
     }
 
 }

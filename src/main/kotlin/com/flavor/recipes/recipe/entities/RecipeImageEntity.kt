@@ -18,5 +18,6 @@ data class RecipeImageEntity(
     val name: String = "",
     val type: String = "",
     val size: Long = 0,
-    val link: String = ""
+    val link: String = "",
+    val thumb: Boolean = false
 )

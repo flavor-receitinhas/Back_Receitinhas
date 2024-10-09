@@ -6,5 +6,8 @@ import org.springframework.stereotype.Repository
 
 @Repository
 interface RecipeImageRepository : JpaRepository<RecipeImageEntity, String> {
+    fun countByRecipeIdAndThumb(recipeId: String, thumb: Boolean): Long
     fun countByRecipeId(recipeId: String): Long
+
+    fun findByRecipeId(recipeId: String): List<RecipeImageEntity>
 }
