@@ -4,6 +4,7 @@ import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
+import com.flavor.recipes.recipe.repositories.RecipeImageRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
 import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -14,6 +15,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.sql.Timestamp
 import java.util.*
+import kotlin.jvm.optionals.getOrNull
 
 @RestController
 @RequestMapping("/favorite")
@@ -24,6 +26,9 @@ class FavoriteController {
 
     @Autowired
     lateinit var recipeRepository: RecipeRepository
+
+    @Autowired
+    lateinit var recipeImageRepository: RecipeImageRepository
 
     @GetMapping("/{userId}")
     fun list(
@@ -62,9 +67,10 @@ class FavoriteController {
         }
         return find.map {
             val recipe = recipeRepository.findById(it.recipeId).get()
+            val thumb = recipeImageRepository.findByRecipeIdAndThumb(it.recipeId, true)
             ListFavoriteDto(
                 favorite = it,
-                thumb = recipe.thumb,
+                thumb = thumb.getOrNull()?.link,
                 timePrepared = recipe.timePrepared
             )
         }.toList()
