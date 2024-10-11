@@ -1,45 +1,46 @@
-x-logging:
-  &x-logging
-  logging:
-    driver: 'json-file'
-    options:
-      max-file: '1'
-      max-size: '10m'
 version: '3'
 
 services:
   postgres:
-    image: postgres # fix issues when upgrading using: mysql_upgrade -u root -p
+    image: postgres
     container_name: postgres
-    <<: *x-logging
+    logging:
+      driver: 'json-file'
+      options:
+        max-file: '1'
+        max-size: '10m'
     restart: unless-stopped
     networks:
       - rede-default
+
     environment:
-      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
     ports:
-      - 5432:5432
-  app:
-    build: .
+      - "5432:5432"
+
+  api-receitinhas:
+    image: cledsonv/receitinhas
     restart: always
-    <<: *x-logging
     environment:
-      DB_USER: ${DB_USER}
       DB_PASSWORD: ${DB_PASSWORD}
       DB_URL: ${DB_URL}
-      MONGO_PASSWORD: ${MONGO_PASSWORD}
-      GOOGLE_APPLICATION_CREDENTIALS: ${GOOGLE_APPLICATION_CREDENTIALS}
-      MONGO_HOST: ${MONGO_HOST}
+      DB_USER: ${DB_USER}
+      GOOGLE_APPLICATION_CREDENTIALS: src/main/resources/adc.json
+    logging:
+      driver: 'json-file'
+      options:
+        max-file: '1'
+        max-size: '10m'
     networks:
       - rede-default
     ports:
-      - 80:80
+      - "80:80"
+
 networks:
   rede-default:
 
 
 volumes:
-  mariadb:
-
-  # compose up -d --build --remove-orphans
-  # .\gradlew build -x test
+  pgdata:
