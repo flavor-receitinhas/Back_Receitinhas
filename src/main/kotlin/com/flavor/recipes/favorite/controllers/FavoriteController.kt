@@ -11,6 +11,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.http.HttpStatus
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import java.sql.Timestamp
@@ -77,7 +78,7 @@ class FavoriteController {
     }
 
     @PostMapping("/{userId}")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(@AuthenticationPrincipal user: UserEntity, @RequestBody body: Favorite): Favorite {
         if (body.userId != user.id) {
             throw BusinessException("User do token é diferente do body")
@@ -93,7 +94,7 @@ class FavoriteController {
     }
 
     @DeleteMapping("/{userId}/{id}")
-    @ResponseBody
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(
         @AuthenticationPrincipal user: UserEntity,
         @PathVariable id: Long,

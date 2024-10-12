@@ -14,6 +14,8 @@ import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.http.HttpStatus
+import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
@@ -67,6 +69,7 @@ class RecipeController {
     }
 
     @PostMapping
+    @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody body: RecipeCreateDto, @AuthenticationPrincipal user: UserEntity): RecipeEntity {
         if (body.status == RecipeStatus.blocked) {
             throw BusinessException("Não pode criar uma receita bloqueada")
@@ -79,7 +82,8 @@ class RecipeController {
         return recipeService.update(body, id)
     }
 
-    @PutMapping("/{recipeId}/images")
+    @PostMapping("/{recipeId}/images")
+    @ResponseStatus(HttpStatus.CREATED)
     fun createFile(
         @RequestPart file: MultipartFile,
         @PathVariable recipeId: String,
@@ -88,11 +92,13 @@ class RecipeController {
     }
 
     @DeleteMapping("/{recipeId}/images/{imageId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteFile(@PathVariable imageId: String) {
         return recipeService.deleteImage(imageId)
     }
 
-    @PutMapping("/{recipeId}/thumbs")
+    @PostMapping("/{recipeId}/thumbs")
+    @ResponseStatus(HttpStatus.CREATED)
     fun createThumbs(
         @RequestPart file: MultipartFile,
         @PathVariable recipeId: String,
@@ -101,8 +107,9 @@ class RecipeController {
     }
 
     @DeleteMapping("/{recipeId}/thumbs/{imageId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
     fun deleteThumbs(@PathVariable imageId: String) {
-        return recipeService.deleteImage(imageId)
+        recipeService.deleteImage(imageId)
     }
 
     @GetMapping("/{recipeId}/images")

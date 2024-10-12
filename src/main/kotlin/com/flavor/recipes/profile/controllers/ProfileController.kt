@@ -34,7 +34,6 @@ class ProfileController {
     }
 
     @PostMapping("/{userId}")
-    @ResponseBody
     fun updateProfile(
         @RequestBody body: UpdateProfileDto,
         @PathVariable userId: String,
