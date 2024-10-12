@@ -87,7 +87,7 @@ class RecipeController {
         return recipeService.createImage(recipeId, file)
     }
 
-    @PutMapping("/{recipeId}/images/{imageId}")
+    @DeleteMapping("/{recipeId}/images/{imageId}")
     fun deleteFile(@PathVariable imageId: String) {
         return recipeService.deleteImage(imageId)
     }
@@ -100,7 +100,7 @@ class RecipeController {
         return recipeService.createImage(recipeId, file, true)
     }
 
-    @PutMapping("/{recipeId}/thumbs/{imageId}")
+    @DeleteMapping("/{recipeId}/thumbs/{imageId}")
     fun deleteThumbs(@PathVariable imageId: String) {
         return recipeService.deleteImage(imageId)
     }
