@@ -5,7 +5,7 @@ import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.user.entities.DifficultyRecipes
 
-class RecipeCreateDto(
+data class RecipeCreateDto(
     val title: String,
     val subTitle: String,
     val details: String,
