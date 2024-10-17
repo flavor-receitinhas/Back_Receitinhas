@@ -85,9 +85,6 @@ class RecipeController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     fun create(@RequestBody body: RecipeCreateDto, @AuthenticationPrincipal user: UserEntity): RecipeEntity {
-        if (body.status == RecipeStatus.blocked) {
-            throw BusinessException("Não pode criar uma receita bloqueada")
-        }
         return recipeService.create(body, user.id)
     }
 

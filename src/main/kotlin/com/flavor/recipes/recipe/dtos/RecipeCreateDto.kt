@@ -15,5 +15,4 @@ class RecipeCreateDto(
     val instruction: String,
     val serveFood: String,
     val ingredients: List<RecipeIngredientEntity>,
-    val status: RecipeStatus,
 )

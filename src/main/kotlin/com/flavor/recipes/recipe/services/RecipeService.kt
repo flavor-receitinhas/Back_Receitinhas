@@ -163,7 +163,7 @@ class RecipeService {
                 subTitle = dto.subTitle,
                 timePrepared = dto.timePrepared,
                 title = dto.title,
-                status = dto.status,
+                status = RecipeStatus.published,
                 userId = userId,
                 createdAt = Timestamp.from(Date().toInstant()),
                 updatedAt = Timestamp.from(Date().toInstant())
