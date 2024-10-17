@@ -3,10 +3,12 @@ package com.flavor.recipes.recipe.controller
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeIngredientCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeListDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
+import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
@@ -71,7 +73,6 @@ class RecipeController {
         )
     }
 
-
     @GetMapping("/{id}")
     fun get(@PathVariable id: String): RecipeEntity {
         val recipe = recipeService.findById(id)
@@ -130,4 +131,30 @@ class RecipeController {
         return recipeService.findAllImages(recipeId)
     }
 
+    @PostMapping("/{recipeId}/ingredients")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun updateIngredients(
+        @RequestBody body: List<RecipeIngredientCreateDto>,
+        @PathVariable recipeId: String,
+    ) {
+        for (ingredient in body) {
+            recipeService.createRecipeIngredient(ingredient, recipeId)
+        }
+    }
+
+    @GetMapping("/{recipeId}/ingredients")
+    @ResponseStatus(HttpStatus.OK)
+    fun findIngredients(@PathVariable recipeId: String): List<RecipeIngredientEntity> {
+        return recipeService.findIngredients(recipeId)
+    }
+
+    @DeleteMapping("/{recipeId}/ingredients/{ingredientId}")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    fun deleteIngredients(
+        @RequestBody body: List<RecipeIngredientCreateDto>,
+        @PathVariable recipeId: String,
+        @PathVariable ingredientId: String,
+    ) {
+        recipeService.deleteIngredient(ingredientId)
+    }
 }

@@ -13,6 +13,5 @@ data class RecipeCreateDto(
     val difficultyRecipe: DifficultyRecipes,
     val portion: Int,
     val instruction: String,
-    val serveFood: String,
-    val ingredients: List<RecipeIngredientEntity>,
+    val serveFood: String
 )

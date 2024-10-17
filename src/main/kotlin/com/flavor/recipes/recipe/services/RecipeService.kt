@@ -2,13 +2,16 @@ package com.flavor.recipes.recipe.services
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeIngredientCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeListDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
+import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeImageRepository
+import com.flavor.recipes.recipe.repositories.RecipeIngredientRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
 import com.flavor.recipes.user.entities.DifficultyRecipes
 import jakarta.persistence.criteria.CriteriaBuilder
@@ -35,6 +38,12 @@ class RecipeService {
 
     @Autowired
     lateinit var recipeRepository: RecipeRepository
+
+    @Autowired
+    lateinit var recipeIngredientRepository: RecipeIngredientRepository
+
+    @Autowired
+    lateinit var ingredientRepository: RecipeIngredientRepository
     fun search(
         isDesc: Boolean,
         page: Int,
@@ -156,7 +165,6 @@ class RecipeService {
             RecipeEntity(
                 details = dto.details,
                 difficultyRecipe = dto.difficultyRecipe,
-                ingredients = dto.ingredients,
                 instruction = dto.instruction,
                 portion = dto.portion,
                 serveFood = dto.serveFood,
@@ -181,7 +189,6 @@ class RecipeService {
             recipe.copy(
                 details = dto.details,
                 difficultyRecipe = dto.difficultyRecipe,
-                ingredients = dto.ingredients,
                 instruction = dto.instruction,
                 portion = dto.portion,
                 serveFood = dto.serveFood,
@@ -224,11 +231,37 @@ class RecipeService {
         )
     }
 
-
     fun deleteImage(id: String) {
         recipeImageRepository.findById(id).getOrNull()
             ?: throw BusinessException("Imagem não encontrada")
         recipeBucketRepository.deleteImage(id)
         recipeImageRepository.deleteById(id)
+    }
+
+    fun createRecipeIngredient(dto: RecipeIngredientCreateDto, recipeId: String): RecipeIngredientEntity {
+        recipeRepository.findById(recipeId).getOrNull()
+            ?: throw BusinessException("Receita não encontrada")
+
+        ingredientRepository.findById(dto.ingredientId).getOrNull()
+            ?: throw BusinessException("Ingrediente não encontrada")
+
+        return recipeIngredientRepository.save(
+            RecipeIngredientEntity(
+                recipeId = recipeId,
+                ingredientId = dto.ingredientId,
+                quantity = dto.quantity,
+                unit = dto.unit,
+            )
+        )
+    }
+
+    fun deleteIngredient(id: String) {
+        ingredientRepository.findById(id).getOrNull()
+            ?: throw BusinessException("Ingrediente não encontrada")
+        ingredientRepository.deleteById(id)
+    }
+
+    fun findIngredients(recipeId: String): List<RecipeIngredientEntity> {
+        return ingredientRepository.findByRecipeId(recipeId)
     }
 }

@@ -1,6 +1,5 @@
 package com.flavor.recipes.recipe.entities
 
-import com.flavor.recipes.recipe.converters.RecipeIngredientEntitySetConverter
 import com.flavor.recipes.user.entities.DifficultyRecipes
 import jakarta.persistence.*
 import org.hibernate.annotations.UuidGenerator
@@ -27,10 +26,6 @@ data class RecipeEntity(
     val instruction: String,
     @Column(name = "serve_food", nullable = false)
     val serveFood: String,
-    @Lob
-    @Convert(converter = RecipeIngredientEntitySetConverter::class)
-    @Column(name = "ingredients", columnDefinition = "json", nullable = false)
-    val ingredients: List<RecipeIngredientEntity>,
     val status: RecipeStatus,
     @Column(name = "created_at", nullable = false)
     var createdAt: Timestamp,
