@@ -1,6 +1,7 @@
 package com.flavor.recipes.recipe.services
 
 import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.ingredient.repository.IngredientRepository
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeIngredientCreateDto
 import com.flavor.recipes.recipe.dtos.RecipeListDto
@@ -43,7 +44,7 @@ class RecipeService {
     lateinit var recipeIngredientRepository: RecipeIngredientRepository
 
     @Autowired
-    lateinit var ingredientRepository: RecipeIngredientRepository
+    lateinit var ingredientRepository: IngredientRepository
     fun search(
         isDesc: Boolean,
         page: Int,
@@ -262,6 +263,6 @@ class RecipeService {
     }
 
     fun findIngredients(recipeId: String): List<RecipeIngredientEntity> {
-        return ingredientRepository.findByRecipeId(recipeId)
+        return recipeIngredientRepository.findByRecipeId(recipeId)
     }
 }
