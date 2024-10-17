@@ -3,6 +3,7 @@ package com.flavor.recipes.recipe.controller
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.profile.entities.ProfileEntity
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeListDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
@@ -10,6 +11,7 @@ import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
 import com.flavor.recipes.recipe.services.RecipeService
+import com.flavor.recipes.user.entities.DifficultyRecipes
 import com.flavor.recipes.user.entities.UserEntity
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
@@ -33,12 +35,24 @@ class RecipeController {
     fun list(
         @RequestParam isDesc: Boolean?,
         @RequestParam page: Int?,
-        @RequestParam sort: String?
-    ): List<RecipeEntity> {
-        return recipeService.findByStatusNot(
-            RecipeStatus.blocked.name, isDesc = isDesc ?: true,
+        @RequestParam sort: String?,
+        @RequestParam timePreparedTo: Int?,
+        @RequestParam timePreparedFrom: Int?,
+        @RequestParam portionTo: Int?,
+        @RequestParam portionFrom: Int?,
+        @RequestParam difficultyRecipe: DifficultyRecipes?,
+        @RequestParam search: String?
+    ): List<RecipeListDto> {
+        return recipeService.search(
+            isDesc = isDesc ?: true,
             page = page ?: 0,
-            sort = sort ?: RecipeEntity::createdAt.name
+            sort = sort ?: RecipeEntity::title.name,
+            portionTo = portionTo,
+            portionFrom = portionFrom,
+            timePreparedTo = portionTo,
+            timePreparedFrom = portionFrom,
+            difficultyRecipe = difficultyRecipe,
+            search = search,
         )
     }
 

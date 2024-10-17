@@ -29,7 +29,7 @@ data class RecipeEntity(
     val serveFood: String,
     @Lob
     @Convert(converter = RecipeIngredientEntitySetConverter::class)
-    @Column(name = "ingredients", columnDefinition = "text", nullable = false)
+    @Column(name = "ingredients", columnDefinition = "json", nullable = false)
     val ingredients: List<RecipeIngredientEntity>,
     val status: RecipeStatus,
     @Column(name = "created_at", nullable = false)

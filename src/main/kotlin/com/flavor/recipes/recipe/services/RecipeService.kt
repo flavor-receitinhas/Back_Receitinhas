@@ -2,6 +2,7 @@ package com.flavor.recipes.recipe.services
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.recipe.dtos.RecipeCreateDto
+import com.flavor.recipes.recipe.dtos.RecipeListDto
 import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
@@ -9,9 +10,15 @@ import com.flavor.recipes.recipe.entities.RecipeStatus
 import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
 import com.flavor.recipes.recipe.repositories.RecipeImageRepository
 import com.flavor.recipes.recipe.repositories.RecipeRepository
+import com.flavor.recipes.user.entities.DifficultyRecipes
+import jakarta.persistence.criteria.CriteriaBuilder
+import jakarta.persistence.criteria.CriteriaQuery
+import jakarta.persistence.criteria.Predicate
+import jakarta.persistence.criteria.Root
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import org.springframework.data.domain.Sort
+import org.springframework.data.jpa.domain.Specification
 import org.springframework.stereotype.Service
 import org.springframework.web.multipart.MultipartFile
 import java.sql.Timestamp
@@ -28,6 +35,78 @@ class RecipeService {
 
     @Autowired
     lateinit var recipeRepository: RecipeRepository
+    fun search(
+        isDesc: Boolean,
+        page: Int,
+        sort: String,
+        timePreparedTo: Int?,
+        timePreparedFrom: Int?,
+        portionTo: Int?,
+        portionFrom: Int?,
+        difficultyRecipe: DifficultyRecipes?,
+        search: String?
+    ): List<RecipeListDto> {
+        val result = recipeRepository.findAll(
+            Specification(fun(
+                root: Root<RecipeEntity>,
+                _: CriteriaQuery<*>?,
+                builder: CriteriaBuilder,
+            ): Predicate? {
+                val predicates = mutableListOf<Predicate>()
+                if (timePreparedFrom != null && timePreparedTo != null) {
+                    predicates.add(
+                        builder.between(
+                            root.get(RecipeEntity::timePrepared.name),
+                            timePreparedFrom,
+                            timePreparedTo
+                        )
+                    )
+                }
+                if (portionTo != null && portionFrom != null) {
+                    predicates.add(
+                        builder.between(
+                            root.get(RecipeEntity::portion.name),
+                            portionFrom,
+                            portionTo
+                        )
+                    )
+                }
+                if (difficultyRecipe != null) {
+                    predicates.add(
+                        builder.equal(
+                            root.get<String>(RecipeEntity::difficultyRecipe.name),
+                            difficultyRecipe
+                        )
+                    )
+                }
+                if (search != null) {
+                    predicates.add(
+                        builder.like(
+                            builder.lower(root.get(RecipeEntity::title.name)),
+                            "%" + search.lowercase() + "%"
+                        )
+                    )
+                }
+                return builder.and(*predicates.toTypedArray())
+            }),
+            PageRequest.of(
+                page,
+                25,
+                if (isDesc) Sort.by(sort).descending() else
+                    Sort.by(sort)
+            )
+        )
+        return result.content.map {
+            val thumb = recipeImageRepository.findByRecipeIdAndThumb(it.id!!, true).getOrNull()
+            RecipeListDto(
+                recipeId = it.id,
+                thumb = thumb?.link,
+                title = it.title,
+                timePrepared = it.timePrepared
+            )
+        }
+    }
+
     fun findByUser(
         userId: String,
         page: Int,

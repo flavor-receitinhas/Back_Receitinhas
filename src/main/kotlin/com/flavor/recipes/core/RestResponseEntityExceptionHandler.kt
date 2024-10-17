@@ -1,6 +1,7 @@
 package com.flavor.recipes.core
 
 import io.sentry.Sentry
+import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
@@ -11,6 +12,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 @ControllerAdvice
 class RestResponseEntityExceptionHandler
     : ResponseEntityExceptionHandler() {
+    val log: Logger = LoggerFactory.getLogger(this::class.java)
 
     @ExceptionHandler(BusinessException::class)
     fun handleBusinessError(e: BusinessException): ResponseEntity<Any> {
@@ -23,7 +25,7 @@ class RestResponseEntityExceptionHandler
     @ExceptionHandler(Exception::class)
     fun handleInternalServerError(e: Exception): ResponseEntity<Any> {
         Sentry.captureException(e)
-        LoggerFactory.getLogger("ExceptionHandler").trace(e.message, e)
+        log.error(e.toString(), e)
         return ResponseEntity<Any>(
             mapOf("message" to "Ocorreu um erro no serviço"),
             HttpStatus.INTERNAL_SERVER_ERROR
