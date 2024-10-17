@@ -5,6 +5,6 @@ import jakarta.persistence.*
 
 data class RecipeIngredientEntity(
     val ingredient: IngredientEntity,
-    val quantity: Int,
+    val quantity: Double,
     val unit: String
 )
