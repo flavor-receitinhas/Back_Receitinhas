@@ -259,11 +259,11 @@ class RecipeService {
         ingredientRepository.deleteById(id)
     }
 
-    fun findIngredients(recipeId: String): List<RecipeIngredientList> {
+    fun findIngredients(recipeId: String): List<RecipeIngredientListDto> {
         val result = recipeIngredientRepository.findByRecipeId(recipeId)
         return result.map {
             val ingredient = ingredientRepository.findById(it.ingredientId)
-            RecipeIngredientList(
+            RecipeIngredientListDto(
                 id = it.id,
                 recipeId = it.recipeId,
                 ingredientId = it.ingredientId,

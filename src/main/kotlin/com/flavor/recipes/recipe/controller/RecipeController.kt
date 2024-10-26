@@ -1,30 +1,19 @@
 package com.flavor.recipes.recipe.controller
 
 import com.flavor.recipes.core.BusinessException
-import com.flavor.recipes.profile.entities.ProfileEntity
-import com.flavor.recipes.recipe.dtos.RecipeCreateDto
-import com.flavor.recipes.recipe.dtos.RecipeIngredientCreateDto
-import com.flavor.recipes.recipe.dtos.RecipeListDto
-import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
+import com.flavor.recipes.recipe.dtos.*
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
-import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
 import com.flavor.recipes.recipe.entities.RecipeStatus
-import com.flavor.recipes.recipe.repositories.RecipeBucketRepository
-import com.flavor.recipes.recipe.repositories.RecipeRepository
 import com.flavor.recipes.recipe.services.RecipeService
 import com.flavor.recipes.user.entities.DifficultyRecipes
 import com.flavor.recipes.user.entities.UserEntity
-import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.tags.Tag
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.http.HttpStatus
-import org.springframework.http.ResponseEntity
 import org.springframework.security.core.annotation.AuthenticationPrincipal
 import org.springframework.web.bind.annotation.*
 import org.springframework.web.multipart.MultipartFile
-import java.sql.Timestamp
-import java.util.Date
 
 @RestController
 @RequestMapping("/recipe")
@@ -144,7 +133,7 @@ class RecipeController {
 
     @GetMapping("/{recipeId}/ingredients")
     @ResponseStatus(HttpStatus.OK)
-    fun findIngredients(@PathVariable recipeId: String): List<RecipeIngredientList> {
+    fun findIngredients(@PathVariable recipeId: String): List<RecipeIngredientListDto> {
         return recipeService.findIngredients(recipeId)
     }
 
