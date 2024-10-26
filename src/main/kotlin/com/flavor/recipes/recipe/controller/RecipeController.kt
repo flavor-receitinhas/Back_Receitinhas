@@ -144,7 +144,7 @@ class RecipeController {
 
     @GetMapping("/{recipeId}/ingredients")
     @ResponseStatus(HttpStatus.OK)
-    fun findIngredients(@PathVariable recipeId: String): List<RecipeIngredientEntity> {
+    fun findIngredients(@PathVariable recipeId: String): List<RecipeIngredientList> {
         return recipeService.findIngredients(recipeId)
     }
 

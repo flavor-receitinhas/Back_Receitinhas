@@ -2,10 +2,7 @@ package com.flavor.recipes.recipe.services
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.ingredient.repository.IngredientRepository
-import com.flavor.recipes.recipe.dtos.RecipeCreateDto
-import com.flavor.recipes.recipe.dtos.RecipeIngredientCreateDto
-import com.flavor.recipes.recipe.dtos.RecipeListDto
-import com.flavor.recipes.recipe.dtos.RecipeUpdateDto
+import com.flavor.recipes.recipe.dtos.*
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
 import com.flavor.recipes.recipe.entities.RecipeIngredientEntity
@@ -262,7 +259,18 @@ class RecipeService {
         ingredientRepository.deleteById(id)
     }
 
-    fun findIngredients(recipeId: String): List<RecipeIngredientEntity> {
-        return recipeIngredientRepository.findByRecipeId(recipeId)
+    fun findIngredients(recipeId: String): List<RecipeIngredientList> {
+        val result = recipeIngredientRepository.findByRecipeId(recipeId)
+        return result.map {
+            val ingredient = ingredientRepository.findById(it.ingredientId)
+            RecipeIngredientList(
+                id = it.id,
+                recipeId = it.recipeId,
+                ingredientId = it.ingredientId,
+                unit = it.unit,
+                quantity = it.quantity,
+                ingredientName = ingredient.get().name
+            )
+        }
     }
 }
