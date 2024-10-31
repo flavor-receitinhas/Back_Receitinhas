@@ -28,11 +28,15 @@ services:
       DB_URL: ${DB_URL}
       DB_USER: ${DB_USER}
       GOOGLE_APPLICATION_CREDENTIALS: src/main/resources/adc.json
+      BUCKET_CONFIG: ${BUCKET_CONFIG}
     logging:
       driver: 'json-file'
       options:
         max-file: '1'
         max-size: '10m'
+    volumes:
+      - ./config:/src/main/resources/config
+      - ./chave_privada_perfil_oracle.pem:/src/main/resources/chave_privada_perfil_oracle.pem
     networks:
       - rede-default
     ports:

@@ -37,7 +37,7 @@ class RecipeController {
         return recipeService.search(
             isDesc = isDesc ?: true,
             page = page ?: 0,
-            sort = sort ?: RecipeEntity::title.name,
+            sort = sort ?: RecipeEntity::createdAt.name,
             portionTo = portionTo,
             portionFrom = portionFrom,
             timePreparedTo = portionTo,
