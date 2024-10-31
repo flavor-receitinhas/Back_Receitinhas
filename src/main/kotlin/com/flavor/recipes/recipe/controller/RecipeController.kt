@@ -53,7 +53,7 @@ class RecipeController {
         @RequestParam isDesc: Boolean?,
         @RequestParam page: Int?,
         @RequestParam sort: String?
-    ): List<RecipeEntity> {
+    ): List<RecipeListDto> {
         return recipeService.findByUser(
             userId = userId,
             isDesc = isDesc ?: true,

@@ -119,7 +119,7 @@ class RecipeService {
         page: Int,
         isDesc: Boolean,
         sort: String
-    ): List<RecipeEntity> {
+    ): List<RecipeListDto> {
         val size = 25
         val pagination = PageRequest.of(
             page,
@@ -127,7 +127,16 @@ class RecipeService {
             if (isDesc) Sort.by(sort).descending() else
                 Sort.by(sort)
         )
-        return recipeRepository.findByUserId(userId = userId, pagination)
+        val result = recipeRepository.findByUserId(userId = userId, pagination)
+        return result.map {
+            val thumb = recipeImageRepository.findByRecipeIdAndThumb(it.id!!, true).getOrNull()
+            RecipeListDto(
+                recipeId = it.id,
+                thumb = thumb?.link,
+                title = it.title,
+                timePrepared = it.timePrepared
+            )
+        }
     }
 
     fun findByStatusNot(

@@ -1,6 +1,7 @@
 package com.flavor.recipes.favorite.controllers
 
 import com.flavor.recipes.core.BusinessException
+import com.flavor.recipes.favorite.dtos.FavoriteCheckDto
 import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
@@ -91,6 +92,17 @@ class FavoriteController {
                 updatedAt = Timestamp.from(Date().toInstant())
             )
         )
+    }
+
+    @GetMapping("/recipe/{recipeId}")
+    fun checkRecipe(@AuthenticationPrincipal user: UserEntity, @PathVariable recipeId: String): FavoriteCheckDto {
+        val recipe = recipeRepository.findById(recipeId)
+        if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
+        val result = favoriteRepository.findByUserIdAndRecipeId(
+            recipeId = recipeId,
+            userId = user.id,
+        )
+        return FavoriteCheckDto(result.isPresent)
     }
 
     @DeleteMapping("/{userId}/{id}")
