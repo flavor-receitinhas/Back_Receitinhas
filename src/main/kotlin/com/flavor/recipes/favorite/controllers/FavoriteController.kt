@@ -2,6 +2,7 @@ package com.flavor.recipes.favorite.controllers
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.favorite.dtos.FavoriteCheckDto
+import com.flavor.recipes.favorite.dtos.FavoriteCreateDto
 import com.flavor.recipes.favorite.dtos.ListFavoriteDto
 import com.flavor.recipes.favorite.entities.Favorite
 import com.flavor.recipes.favorite.repositories.FavoriteRepository
@@ -32,22 +33,18 @@ class FavoriteController {
     @Autowired
     lateinit var recipeImageRepository: RecipeImageRepository
 
-    @GetMapping("/{userId}")
+    @GetMapping
     fun list(
         @AuthenticationPrincipal user: UserEntity,
-        @PathVariable userId: String,
         @RequestParam sort: String?,
         @RequestParam page: Int?,
         @RequestParam isDesc: Boolean = false,
         @RequestParam search: String?,
     ): List<ListFavoriteDto> {
-        if (userId != user.id) {
-            throw BusinessException("User não pode ver os favoritos de outro usuario")
-        }
         if (search != null && search.isEmpty()) throw BusinessException("search não pode ser vazio")
         val find = if (search != null) {
             favoriteRepository.findByUserIdAndSearch(
-                userId,
+                user.id,
                 search,
                 PageRequest.of(
                     page ?: 0,
@@ -58,7 +55,7 @@ class FavoriteController {
             )
         } else {
             favoriteRepository.findByUserId(
-                userId,
+                user.id,
                 PageRequest.of(
                     page ?: 0,
                     25,
@@ -71,23 +68,23 @@ class FavoriteController {
             val recipe = recipeRepository.findById(it.recipeId).get()
             val thumb = recipeImageRepository.findByRecipeIdAndThumb(it.recipeId, true)
             ListFavoriteDto(
-                favorite = it,
+                favorite = it.copy(name = recipe.title),
                 thumb = thumb.getOrNull()?.link,
                 timePrepared = recipe.timePrepared
             )
         }.toList()
     }
 
-    @PostMapping("/{userId}")
+    @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    fun create(@AuthenticationPrincipal user: UserEntity, @RequestBody body: Favorite): Favorite {
-        if (body.userId != user.id) {
-            throw BusinessException("User do token é diferente do body")
-        }
+    fun create(@AuthenticationPrincipal user: UserEntity, @RequestBody body: FavoriteCreateDto): Favorite {
         val recipe = recipeRepository.findById(body.recipeId)
         if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
         return favoriteRepository.save(
-            body.copy(
+            Favorite(
+                userId = user.id,
+                recipeId = body.recipeId,
+                name = recipe.get().title,
                 createdAt = Timestamp.from(Date().toInstant()),
                 updatedAt = Timestamp.from(Date().toInstant())
             )
@@ -105,7 +102,7 @@ class FavoriteController {
         return FavoriteCheckDto(result.isPresent)
     }
 
-    @DeleteMapping("/{userId}/{id}")
+    @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(
         @AuthenticationPrincipal user: UserEntity,
