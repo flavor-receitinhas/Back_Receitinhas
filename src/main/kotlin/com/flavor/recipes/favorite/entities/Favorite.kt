@@ -1,14 +1,16 @@
 package com.flavor.recipes.favorite.entities
 
 import jakarta.persistence.*
+import org.hibernate.annotations.UuidGenerator
 import java.sql.Timestamp
 
 @Entity
 @Table(name = "favorite")
 data class Favorite(
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    var id: Long? = null,
+    @UuidGenerator
+    @Column(name = "id", updatable = false, unique = true, nullable = false)
+    var id: String? = null,
     @Column(name = "recipe_id", nullable = false)
     var recipeId: String,
     @Column(name = "user_id", nullable = false)

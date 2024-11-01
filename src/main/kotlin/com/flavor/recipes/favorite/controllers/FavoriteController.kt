@@ -95,11 +95,14 @@ class FavoriteController {
     fun checkRecipe(@AuthenticationPrincipal user: UserEntity, @PathVariable recipeId: String): FavoriteCheckDto {
         val recipe = recipeRepository.findById(recipeId)
         if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
-        val result = favoriteRepository.findByUserIdAndRecipeId(
+        val favorite = favoriteRepository.findByUserIdAndRecipeId(
             recipeId = recipeId,
             userId = user.id,
         )
-        return FavoriteCheckDto(result.isPresent)
+        return FavoriteCheckDto(
+            favoriteId = favorite.getOrNull()?.id,
+            exists = favorite.isPresent
+        )
     }
 
     @DeleteMapping("/{id}")
