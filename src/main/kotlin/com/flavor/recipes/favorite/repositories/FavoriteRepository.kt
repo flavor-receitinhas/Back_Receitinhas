@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository
 import java.util.Optional
 
 @Repository
-interface FavoriteRepository : JpaRepository<Favorite, Long> {
+interface FavoriteRepository : JpaRepository<Favorite, String> {
     @Query("Select c from Favorite c where c.name like %:search% and c.userId = :userId")
     fun findByUserIdAndSearch(userId: String, search: String, pageable: PageRequest): List<Favorite>
     fun findByUserId(userId: String, pageable: PageRequest): List<Favorite>

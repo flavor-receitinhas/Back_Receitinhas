@@ -80,6 +80,11 @@ class FavoriteController {
     fun create(@AuthenticationPrincipal user: UserEntity, @RequestBody body: FavoriteCreateDto): Favorite {
         val recipe = recipeRepository.findById(body.recipeId)
         if (!recipe.isPresent) throw BusinessException("Receita não encontrada")
+        val favorite = favoriteRepository.findByUserIdAndRecipeId(
+            recipeId = body.recipeId,
+            userId = user.id,
+        )
+        if (favorite.isPresent) throw BusinessException("Receita já foi favoritada")
         return favoriteRepository.save(
             Favorite(
                 userId = user.id,
@@ -109,7 +114,7 @@ class FavoriteController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun delete(
         @AuthenticationPrincipal user: UserEntity,
-        @PathVariable id: Long,
+        @PathVariable id: String,
     ) {
         val find = favoriteRepository.findById(id)
         if (!find.isPresent) {
