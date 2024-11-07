@@ -63,13 +63,13 @@ class RecipeController {
     }
 
     @GetMapping("/{id}")
-    fun get(@PathVariable id: String): RecipeEntity {
-        val recipe = recipeService.findById(id)
+    fun get(@PathVariable id: String): RecipeGetDto {
+        val result = recipeService.findByIdWithProfile(id)
             ?: throw BusinessException("Receita não encontrada")
-        if (recipe.status == RecipeStatus.blocked) {
+        if (result.recipe.status == RecipeStatus.blocked) {
             throw BusinessException("Está receita foi bloqueada")
         }
-        return recipe
+        return result
     }
 
     @PostMapping

@@ -2,6 +2,7 @@ package com.flavor.recipes.recipe.services
 
 import com.flavor.recipes.core.BusinessException
 import com.flavor.recipes.ingredient.repository.IngredientRepository
+import com.flavor.recipes.profile.services.ProfileService
 import com.flavor.recipes.recipe.dtos.*
 import com.flavor.recipes.recipe.entities.RecipeEntity
 import com.flavor.recipes.recipe.entities.RecipeImageEntity
@@ -42,6 +43,9 @@ class RecipeService {
 
     @Autowired
     lateinit var ingredientRepository: IngredientRepository
+
+    @Autowired
+    lateinit var profileService: ProfileService
     fun search(
         isDesc: Boolean,
         page: Int,
@@ -157,6 +161,13 @@ class RecipeService {
 
     fun findById(id: String): RecipeEntity? {
         return recipeRepository.findById(id).getOrNull()
+    }
+
+    fun findByIdWithProfile(recipeId: String): RecipeGetDto? {
+        val response = recipeRepository.findById(recipeId).getOrNull()
+            ?: return null
+        val profile = profileService.byId(response.userId)
+        return RecipeGetDto(recipe = response, name = profile.name, imageProfile = profile.image)
     }
 
     fun findAllImages(recipeId: String): List<RecipeImageEntity> {
