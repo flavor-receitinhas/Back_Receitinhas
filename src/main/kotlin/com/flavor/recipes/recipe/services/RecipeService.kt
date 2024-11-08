@@ -167,7 +167,7 @@ class RecipeService {
     fun findByIdWithProfile(recipeId: String): RecipeGetDto? {
         val response = recipeRepository.findById(recipeId).getOrNull()
             ?: return null
-        val profile = profileRepository.findById(response.userId).getOrNull()
+        val profile = profileRepository.findByUserId(response.userId)
         return RecipeGetDto(recipe = response, authorName = profile?.name)
     }
 
