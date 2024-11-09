@@ -54,7 +54,7 @@ class RecipeController {
         @RequestParam page: Int?,
         @RequestParam sort: String?
     ): List<RecipeListDto> {
-        return recipeService.findByUser(
+        return recipeService.search(
             userId = userId,
             isDesc = isDesc ?: true,
             page = page ?: 0,

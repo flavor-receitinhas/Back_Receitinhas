@@ -51,12 +51,13 @@ class RecipeService {
         isDesc: Boolean,
         page: Int,
         sort: String,
-        timePreparedTo: Int?,
-        timePreparedFrom: Int?,
-        portionTo: Int?,
-        portionFrom: Int?,
-        difficultyRecipe: DifficultyRecipes?,
-        search: String?
+        timePreparedTo: Int? = null,
+        timePreparedFrom: Int? = null,
+        portionTo: Int? = null,
+        portionFrom: Int? = null,
+        difficultyRecipe: DifficultyRecipes? = null,
+        search: String? = null,
+        userId: String? = null
     ): List<RecipeListDto> {
         val result = recipeRepository.findAll(
             Specification(fun(
@@ -91,6 +92,14 @@ class RecipeService {
                         )
                     )
                 }
+                if (userId != null) {
+                    predicates.add(
+                        builder.equal(
+                            root.get<String>(RecipeEntity::userId.name),
+                            userId
+                        )
+                    )
+                }
                 if (search != null) {
                     predicates.add(
                         builder.like(
@@ -119,30 +128,6 @@ class RecipeService {
         }
     }
 
-    fun findByUser(
-        userId: String,
-        page: Int,
-        isDesc: Boolean,
-        sort: String
-    ): List<RecipeListDto> {
-        val size = 25
-        val pagination = PageRequest.of(
-            page,
-            size,
-            if (isDesc) Sort.by(sort).descending() else
-                Sort.by(sort)
-        )
-        val result = recipeRepository.findByUserId(userId = userId, pagination)
-        return result.map {
-            val thumb = recipeImageRepository.findByRecipeIdAndThumb(it.id!!, true).getOrNull()
-            RecipeListDto(
-                recipeId = it.id,
-                thumb = thumb?.link,
-                title = it.title,
-                timePrepared = it.timePrepared
-            )
-        }
-    }
 
     fun findByStatusNot(
         status: String,
