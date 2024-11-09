@@ -52,13 +52,25 @@ class RecipeController {
         @PathVariable userId: String,
         @RequestParam isDesc: Boolean?,
         @RequestParam page: Int?,
-        @RequestParam sort: String?
+        @RequestParam sort: String?,
+        @RequestParam timePreparedTo: Int?,
+        @RequestParam timePreparedFrom: Int?,
+        @RequestParam portionTo: Int?,
+        @RequestParam portionFrom: Int?,
+        @RequestParam difficultyRecipe: DifficultyRecipes?,
+        @RequestParam search: String?
     ): List<RecipeListDto> {
         return recipeService.search(
             userId = userId,
             isDesc = isDesc ?: true,
             page = page ?: 0,
-            sort = sort ?: RecipeEntity::createdAt.name
+            sort = sort ?: RecipeEntity::createdAt.name,
+            portionTo = portionTo,
+            portionFrom = portionFrom,
+            timePreparedTo = portionTo,
+            timePreparedFrom = portionFrom,
+            difficultyRecipe = difficultyRecipe,
+            search = search,
         )
     }
 
