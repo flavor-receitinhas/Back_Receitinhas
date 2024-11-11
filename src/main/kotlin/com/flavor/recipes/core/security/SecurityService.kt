@@ -15,12 +15,6 @@ class SecurityService {
     var logger: Logger = LoggerFactory.getLogger("TokenService")
     fun validateToken(token: String?): UserEntity? {
         try {
-            return UserEntity(
-                id = "2EJYkdagBhdTwhcEHstjRTC6uus2",
-                email = "sdfgsdfgsdfgsdfg",
-                signProvider = "zsdfgsdfgsfdg",
-                emailVerified = true,
-            )
             if (token == null) return null
             // Verify the ID token while checking if the token is revoked by passing checkRevoked
             // as true.
