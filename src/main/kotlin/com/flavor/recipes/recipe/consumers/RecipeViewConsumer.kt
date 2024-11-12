@@ -23,7 +23,6 @@ class RecipeViewConsumer {
     fun onMessage(view: RecipeViewsConsumerDto) {
         val result = recipeViewRepository.findByRecipeIdAndUserId(view.recipeId, view.userId)
         if (!result.isPresent) {
-            val totalView = recipeViewRepository.countByRecipeId(view.recipeId)
             recipeViewRepository.save(
                 RecipeViewEntity(
                     userId = view.userId,
@@ -31,6 +30,7 @@ class RecipeViewConsumer {
                     createdAt = Date().time,
                 )
             )
+            val totalView = recipeViewRepository.countByRecipeId(view.recipeId)
             val recipe = recipeRepository.findById(view.recipeId)
             recipeRepository.save(recipe.get().copy(totalViews = totalView))
         }
